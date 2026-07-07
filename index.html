@@ -4,172 +4,324 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Linger — Bıraktığın ses, bıraktığın yerde.</title>
-<meta name="description" content="Linger, konum tabanlı bir sesli not uygulamasıdır. Bir yerde ses bırak, o yere döndüğünde yeniden dinle. Mekânın hafızası.">
+<meta name="description" content="Linger, konum tabanlı bir sesli not uygulamasıdır. Bir yere ses bırak, o yere döndüğünde yeniden dinle. Mekânın hafızası.">
 <meta property="og:title" content="Linger — Bıraktığın ses, bıraktığın yerde.">
 <meta property="og:description" content="Konum tabanlı sesli not uygulaması. Bir yere ses bırak; oraya döndüğünde bildirim al ve dinle.">
 <meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    --bg:#0E1418; --bg2:#0B1013; --card:#161E23; --card2:#12191E;
+    --line:#2A363D; --line2:#212C33;
+    --tx:#C7D2D6; --tx-hi:#EAF0F1; --tx-mid:#8DA0A8; --tx-lo:#5C6E76;
+    --teal:#15B5A4; --teal2:#3CD6C4; --coral:#FF6B5C;
+    color-scheme: dark;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    background: #0E1418; color: #C7D2D6;
+    background: var(--bg); color: var(--tx);
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.65; font-size: 17px; -webkit-font-smoothing: antialiased;
+    line-height: 1.65; font-size: 17px; -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
-  a { color: #3CD6C4; text-decoration: none; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 22px; }
+  a { color: var(--teal2); text-decoration: none; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
+
+  /* ── Reveal on scroll ─────────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay:.08s } .reveal.d2 { transition-delay:.16s } .reveal.d3 { transition-delay:.24s } .reveal.d4 { transition-delay:.32s }
+
+  /* ── Nav ──────────────────────────────────────────── */
+  nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+    background: rgba(14,20,24,.72); border-bottom: 1px solid transparent; transition: border-color .3s; }
+  nav.scrolled { border-color: var(--line2); }
+  .nav-in { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  .nav-brand { display:flex; align-items:center; gap:10px; font-weight:800; color:var(--tx-hi); font-size:19px; letter-spacing:-.4px; }
+  .nav-cta { font-size:14.5px; font-weight:700; padding:9px 16px; border-radius:999px; background:var(--teal); color:#05201D;
+    transition: transform .15s, box-shadow .15s; }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4); }
 
   /* ── Hero ─────────────────────────────────────────── */
-  .hero {
-    position: relative; overflow: hidden;
-    padding: 96px 22px 88px; text-align: center;
-    background:
-      radial-gradient(700px 420px at 50% -10%, rgba(21,181,164,0.16), transparent 70%),
-      #0E1418;
-  }
-  .hero .logo { display: inline-block; filter: drop-shadow(0 8px 26px rgba(21,181,164,0.35)); }
-  .brand { font-size: 44px; font-weight: 800; letter-spacing: -1px; color: #EAF0F1; margin-top: 22px; }
-  .tag { font-size: 20px; color: #8DA0A8; margin-top: 10px; font-weight: 500; }
-  .lead { max-width: 620px; margin: 26px auto 0; font-size: 18px; color: #A9B8BE; }
-  .cta-row { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 26px; border-radius: 999px; font-weight: 700; font-size: 16px;
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .btn-primary { background: #15B5A4; color: #05201D; box-shadow: 0 10px 30px rgba(21,181,164,0.35); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(21,181,164,0.45); }
-  .btn-ghost { border: 1px solid #2A363D; color: #EAF0F1; }
-  .btn-ghost:hover { border-color: #3CD6C4; }
+  .hero { position: relative; overflow: hidden; padding: 70px 22px 40px;
+    background: radial-gradient(760px 460px at 72% 8%, rgba(21,181,164,.14), transparent 70%), var(--bg); }
+  .hero-grid { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
+  .badge-pill { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border:1px solid var(--line);
+    border-radius:999px; font-size:13.5px; color:var(--tx-mid); background:var(--card); }
+  .badge-dot { width:8px; height:8px; border-radius:50%; background:var(--teal2); box-shadow:0 0 0 0 rgba(60,214,196,.6); animation: pulseDot 2.4s infinite; }
+  @keyframes pulseDot { 0%{box-shadow:0 0 0 0 rgba(60,214,196,.55)} 70%{box-shadow:0 0 0 9px rgba(60,214,196,0)} 100%{box-shadow:0 0 0 0 rgba(60,214,196,0)} }
+  h1.hero-title { font-size: 52px; font-weight: 800; letter-spacing: -1.4px; color: var(--tx-hi); line-height: 1.05; margin: 20px 0 0; }
+  h1.hero-title .grad { background: linear-gradient(100deg,var(--teal2),var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-lead { font-size: 18.5px; color: var(--tx-mid); max-width: 480px; margin-top: 18px; }
+  .cta-row { margin-top: 30px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .ghost-link { font-weight:700; color:var(--tx-hi); font-size:15.5px; display:inline-flex; align-items:center; gap:7px; }
+  .ghost-link:hover { color: var(--teal2); }
+
+  /* App Store button */
+  .appstore-btn { display:inline-flex; align-items:center; gap:11px; padding:12px 20px 12px 18px; border-radius:14px;
+    background:#EAF0F1; color:#0B1013; position:relative; transition: transform .15s, box-shadow .2s; }
+  .appstore-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+  .appstore-btn .as-sub { font-size:11px; line-height:1; opacity:.72; font-weight:600; }
+  .appstore-btn .as-main { font-size:19px; line-height:1.15; font-weight:800; letter-spacing:-.3px; }
+  .appstore-btn .soon-tag { position:absolute; top:-9px; right:-9px; background:var(--teal); color:#05201D; font-size:10.5px;
+    font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.3px; box-shadow:0 4px 12px rgba(21,181,164,.5); }
+  .appstore-btn.soon { cursor: default; }
+
+  /* ── Phone mockup ─────────────────────────────────── */
+  .device-col { display:flex; justify-content:center; }
+  .phone { position: relative; width: 288px; height: 592px; border-radius: 46px; padding: 12px;
+    background: linear-gradient(160deg,#20303a,#0c1216); box-shadow: 0 40px 90px -30px rgba(0,0,0,.8), inset 0 0 0 1.5px #2c3b44;
+    animation: floaty 6s ease-in-out infinite; }
+  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  .screen { position:absolute; inset:12px; border-radius:36px; overflow:hidden;
+    background: radial-gradient(120% 80% at 30% 10%, #14212a, #0b1116 60%); }
+  .notch { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:104px; height:26px; border-radius:0 0 16px 16px; background:#0a0f13; z-index:6; }
+  /* mini map grid */
+  .map { position:absolute; inset:0; opacity:.9;
+    background-image: linear-gradient(rgba(60,214,196,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(60,214,196,.06) 1px, transparent 1px);
+    background-size: 34px 34px; }
+  .map::after { content:''; position:absolute; inset:0; background: radial-gradient(60% 45% at 50% 38%, rgba(21,181,164,.16), transparent 70%); }
+  /* pins */
+  .pin { position:absolute; width:26px; height:33px; transform: translate(-50%,-100%); filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+  .pin.p1 { left:32%; top:34%; } .pin.p2 { left:64%; top:28%; } .pin.p3 { left:52%; top:52%; } .pin.p4 { left:74%; top:56%; }
+  /* sonar ping around active pin */
+  .sonar { position:absolute; left:52%; top:52%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid var(--teal2); animation: sonar 2.6s ease-out infinite; }
+  .sonar.s2 { animation-delay: 1.3s; }
+  @keyframes sonar { 0%{opacity:.85; width:12px; height:12px} 100%{opacity:0; width:150px; height:150px} }
+  /* now-playing card */
+  .np { position:absolute; left:14px; right:14px; bottom:16px; background: rgba(22,30,35,.92); border:1px solid var(--line);
+    border-radius:18px; padding:12px 13px; display:flex; align-items:center; gap:11px; backdrop-filter: blur(6px); box-shadow:0 12px 30px rgba(0,0,0,.5); }
+  .np-play { flex:none; width:38px; height:38px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; }
+  .np-body { flex:1; min-width:0; }
+  .np-title { font-size:13px; font-weight:700; color:var(--tx-hi); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wave { display:flex; align-items:center; gap:2.5px; height:22px; margin-top:5px; }
+  .wave i { flex:1; background: linear-gradient(var(--teal2),var(--teal)); border-radius:2px; height:30%; animation: wv 1.1s ease-in-out infinite; }
+  @keyframes wv { 0%,100%{ height:22% } 50%{ height:95% } }
 
   /* ── Sections ─────────────────────────────────────── */
-  section { padding: 72px 0; }
-  .section-tag { text-transform: uppercase; letter-spacing: 2px; font-size: 13px; font-weight: 700; color: #3CD6C4; text-align: center; }
-  h2 { color: #EAF0F1; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; text-align: center; margin: 10px 0 8px; }
-  .sub { text-align: center; color: #8DA0A8; max-width: 560px; margin: 0 auto 44px; }
+  section { padding: 76px 0; }
+  .sec-tag { text-transform: uppercase; letter-spacing: 2.5px; font-size: 12.5px; font-weight: 700; color: var(--teal2); text-align: center; }
+  h2 { color: var(--tx-hi); font-size: 33px; font-weight: 800; letter-spacing: -0.7px; text-align: center; margin: 10px 0 8px; }
+  .sub { text-align: center; color: var(--tx-mid); max-width: 560px; margin: 0 auto 48px; }
 
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .card {
-    background: #161E23; border: 1px solid #2A363D; border-radius: 18px; padding: 30px 24px;
-  }
-  .card .num {
-    width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    background: rgba(21,181,164,0.14); color: #3CD6C4; font-weight: 800; font-size: 18px; margin-bottom: 16px;
-  }
-  .card h3 { color: #EAF0F1; font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px; transition: transform .25s, border-color .25s; }
+  .card:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4); }
+  .card .num { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
+    background: rgba(21,181,164,.14); color: var(--teal2); font-weight: 800; font-size: 19px; margin-bottom: 16px; }
+  .card h3 { color: var(--tx-hi); font-size: 19px; font-weight: 700; margin-bottom: 8px; }
   .card p { color: #A9B8BE; font-size: 15.5px; }
 
   .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-  .feat { display: flex; gap: 16px; align-items: flex-start; background: #12191E; border: 1px solid #212C33; border-radius: 16px; padding: 22px; }
-  .feat .dot { flex: none; width: 40px; height: 40px; border-radius: 11px; background: rgba(60,214,196,0.12); display: flex; align-items: center; justify-content: center; }
-  .feat h3 { color: #EAF0F1; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--card2); border: 1px solid var(--line2); border-radius: 16px; padding: 22px; transition: transform .25s, border-color .25s; }
+  .feat:hover { transform: translateY(-4px); border-color: rgba(60,214,196,.35); }
+  .feat .dot { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(60,214,196,.12); display: flex; align-items: center; justify-content: center; font-size:20px; }
+  .feat h3 { color: var(--tx-hi); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
   .feat p { color: #93A4AB; font-size: 15px; }
 
-  .privacy-band { background: linear-gradient(180deg, #12191E, #0E1418); border-top: 1px solid #212C33; border-bottom: 1px solid #212C33; }
-  .privacy-band .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
-  .chip { background: #161E23; border: 1px solid #2A363D; border-radius: 999px; padding: 10px 18px; font-size: 14.5px; color: #C7D2D6; font-weight: 600; }
+  /* Moments (mock) */
+  .moments-band { background: var(--bg2); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
+  .moments { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
+  .moment { background: linear-gradient(165deg,var(--card),#121a1f); border:1px solid var(--line); border-radius:18px; padding:20px; position:relative; overflow:hidden; transition: transform .25s, border-color .25s; }
+  .moment:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.4); }
+  .moment::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(21,181,164,.16),transparent 70%); }
+  .m-loc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--teal2); font-weight:700; position:relative; }
+  .m-quote { color:var(--tx-hi); font-size:16px; font-weight:600; margin:12px 0 14px; line-height:1.5; position:relative; }
+  .m-wave { display:flex; align-items:flex-end; gap:3px; height:26px; }
+  .m-wave i { flex:1; background:linear-gradient(var(--teal2),var(--teal)); border-radius:2px; opacity:.85; }
+  .m-foot { display:flex; align-items:center; justify-content:space-between; margin-top:14px; font-size:12px; color:var(--tx-mid); }
+  .m-av { display:flex; align-items:center; gap:8px; }
+  .m-dotimg { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#05201D; }
 
-  /* ── Footer ───────────────────────────────────────── */
-  footer { padding: 56px 22px 64px; border-top: 1px solid #212C33; text-align: center; }
-  .foot-brand { font-size: 22px; font-weight: 800; color: #EAF0F1; letter-spacing: -0.5px; }
+  /* Privacy band */
+  .privacy-band { background: linear-gradient(180deg, var(--card2), var(--bg)); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
+  .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 10px 18px; font-size: 14.5px; color: var(--tx); font-weight: 600; }
+
+  /* Download CTA */
+  .download { text-align:center; position:relative; overflow:hidden;
+    background: radial-gradient(600px 300px at 50% 120%, rgba(21,181,164,.18), transparent 70%); }
+  .dl-card { max-width:720px; margin:0 auto; background:linear-gradient(160deg,var(--card),#101820); border:1px solid var(--line);
+    border-radius:28px; padding:52px 30px; }
+
+  /* Footer */
+  footer { padding: 54px 22px 64px; border-top: 1px solid var(--line2); text-align: center; }
+  .foot-brand { font-size: 22px; font-weight: 800; color: var(--tx-hi); letter-spacing: -0.5px; }
   .foot-links { margin: 20px 0 18px; display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; }
-  .foot-links a { color: #8DA0A8; font-weight: 600; font-size: 15px; }
-  .foot-links a:hover { color: #3CD6C4; }
-  .copy { color: #5C6E76; font-size: 13px; }
+  .foot-links a { color: var(--tx-mid); font-weight: 600; font-size: 15px; }
+  .foot-links a:hover { color: var(--teal2); }
+  .copy { color: var(--tx-lo); font-size: 13px; }
 
-  @media (max-width: 720px) {
-    .steps, .features { grid-template-columns: 1fr; }
-    .brand { font-size: 36px; } .tag { font-size: 18px; } h2 { font-size: 25px; }
-    section { padding: 56px 0; } .hero { padding: 72px 22px 64px; }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 8px; text-align:center; }
+    .device-col { order:-1; }
+    .hero-lead { margin-left:auto; margin-right:auto; } .cta-row { justify-content:center; }
+    .steps, .features, .moments { grid-template-columns: 1fr; }
+    h1.hero-title { font-size: 40px; } h2 { font-size: 27px; } section { padding: 58px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { transition: none; opacity:1; transform:none; }
+    .phone, .sonar, .badge-dot, .wave i { animation: none !important; }
   }
 </style>
 </head>
 <body>
 
+<!-- 🔗 APP STORE LİNKİ — Uygulama App Store'da yayınlanınca:
+     1) Aşağıdaki iki  <a class="appstore-btn ...">  öğesinin href'ini gerçek URL ile değiştir
+        (örn: https://apps.apple.com/tr/app/linger/id0000000000)
+     2) "soon" sınıfını ve  <span class="soon-tag">Yakında</span>  etiketini kaldır. -->
+
+<nav id="nav">
+  <div class="wrap nav-in">
+    <div class="nav-brand">
+      <svg width="26" height="32" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
+        <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
+        <rect x="47" y="23" width="6" height="28" rx="3" fill="#fff"/><rect x="58" y="27" width="6" height="20" rx="3" fill="#fff"/>
+        <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
+      </svg>
+      Linger
+    </div>
+    <a class="nav-cta appstore-jump" href="#indir">İndir</a>
+  </div>
+</nav>
+
 <!-- ── Hero ─────────────────────────────────────────── -->
 <div class="hero">
-  <svg class="logo" width="84" height="105" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linger">
-    <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
-    <rect x="25" y="31" width="6" height="12" rx="3" fill="#FFFFFF"/>
-    <rect x="36" y="27" width="6" height="20" rx="3" fill="#FFFFFF"/>
-    <rect x="47" y="23" width="6" height="28" rx="3" fill="#FFFFFF"/>
-    <rect x="58" y="27" width="6" height="20" rx="3" fill="#FFFFFF"/>
-    <rect x="69" y="31" width="6" height="12" rx="3" fill="#FFFFFF"/>
-  </svg>
-  <div class="brand">Linger</div>
-  <div class="tag">Bıraktığın ses, bıraktığın yerde.</div>
-  <p class="lead">Linger, mekânın hafızasını sese dönüştürür. Bir yerde küçük bir ses bırak; oraya geri döndüğünde Linger sana hatırlatır ve o anı yeniden dinlersin.</p>
-  <div class="cta-row">
-    <a class="btn btn-primary" href="#nasil">Nasıl çalışır?</a>
-    <a class="btn btn-ghost" href="mailto:support@lingerapp.live">İletişim</a>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <span class="badge-pill reveal in"><span class="badge-dot"></span>Mekânın hafızası · sesle</span>
+      <h1 class="hero-title reveal in d1">Bıraktığın ses,<br><span class="grad">bıraktığın yerde.</span></h1>
+      <p class="hero-lead reveal in d2">Linger, bir anı sese dönüştürüp tam da yaşandığı yere sabitler. Oraya geri döndüğünde Linger sana hatırlatır ve o anı yeniden dinlersin.</p>
+      <div class="cta-row reveal in d3">
+        <a class="appstore-btn soon" id="appstore-hero" href="#indir" aria-label="App Store'dan indir (yakında)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
+          <span>
+            <span class="as-sub">İndir —</span><br>
+            <span class="as-main">App Store</span>
+          </span>
+          <span class="soon-tag">Yakında</span>
+        </a>
+        <a class="ghost-link" href="#nasil">Nasıl çalışır? →</a>
+      </div>
+    </div>
+
+    <div class="device-col reveal in d2">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="map"></div>
+          <div class="sonar"></div><div class="sonar s2"></div>
+          <!-- pins -->
+          <svg class="pin p1" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
+          <svg class="pin p2" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#3CD6C4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
+          <svg class="pin p3" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
+          <svg class="pin p4" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#3CD6C4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
+          <div class="np">
+            <div class="np-play"><svg width="15" height="15" viewBox="0 0 24 24" fill="#05201D" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="np-body">
+              <div class="np-title">Sahil kenarı · 2 dk uzakta</div>
+              <div class="wave"><i style="animation-delay:0s"></i><i style="animation-delay:.08s"></i><i style="animation-delay:.16s"></i><i style="animation-delay:.24s"></i><i style="animation-delay:.32s"></i><i style="animation-delay:.4s"></i><i style="animation-delay:.48s"></i><i style="animation-delay:.56s"></i><i style="animation-delay:.64s"></i><i style="animation-delay:.72s"></i><i style="animation-delay:.8s"></i><i style="animation-delay:.88s"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- ── Nasıl çalışır ─────────────────────────────────── -->
 <section id="nasil">
   <div class="wrap">
-    <div class="section-tag">Üç adım</div>
-    <h2>Sesini bir yere bırak</h2>
-    <p class="sub">Not tutmak gibi, ama sesle ve o ana ait olduğu yere sabitlenmiş.</p>
+    <div class="sec-tag reveal">Üç adım</div>
+    <h2 class="reveal d1">Sesini bir yere bırak</h2>
+    <p class="sub reveal d2">Not tutmak gibi — ama sesle ve o ana ait olduğu yere sabitlenmiş.</p>
     <div class="steps">
-      <div class="card">
-        <div class="num">1</div>
-        <h3>Kaydet</h3>
-        <p>Bulunduğun yerde tek dokunuşla sesli bir not kaydet. Konumu otomatik olarak o ana sabitlenir.</p>
-      </div>
-      <div class="card">
-        <div class="num">2</div>
-        <h3>Bırak</h3>
-        <p>Sesin haritada o noktada bekler. Sadece sen, arkadaşların ya da herkes duysun — sen seç.</p>
-      </div>
-      <div class="card">
-        <div class="num">3</div>
-        <h3>Yeniden yaşa</h3>
-        <p>O yere yaklaştığında Linger sana bildirim gönderir. Anıyı bıraktığın yerde, tam da orada dinlersin.</p>
-      </div>
+      <div class="card reveal d1"><div class="num">1</div><h3>Kaydet</h3><p>Bulunduğun yerde tek dokunuşla sesli bir not kaydet. Konumu otomatik olarak o ana sabitlenir.</p></div>
+      <div class="card reveal d2"><div class="num">2</div><h3>Bırak</h3><p>Sesin haritada o noktada bekler. Sadece sen, arkadaşların ya da herkes duysun — sen seç.</p></div>
+      <div class="card reveal d3"><div class="num">3</div><h3>Yeniden yaşa</h3><p>O yere yaklaştığında Linger sana bildirim gönderir. Anıyı bıraktığın yerde, tam da orada dinlersin.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ── Özellikler ────────────────────────────────────── -->
-<section style="background:#0B1013;">
+<section style="background:var(--bg2);">
   <div class="wrap">
-    <div class="section-tag">Özellikler</div>
-    <h2>Küçük bir uygulama, büyük anlar</h2>
-    <p class="sub">Konumun etrafında dönen sade ve samimi bir deneyim.</p>
+    <div class="sec-tag reveal">Özellikler</div>
+    <h2 class="reveal d1">Küçük bir uygulama, büyük anlar</h2>
+    <p class="sub reveal d2">Konumun etrafında dönen sade ve samimi bir deneyim.</p>
     <div class="features">
-      <div class="feat">
-        <div class="dot">📍</div>
-        <div><h3>Konuma sabitli sesler</h3><p>Her ses tam bırakıldığı koordinatta yaşar; harita üstünde canlı pin olarak görünür.</p></div>
+      <div class="feat reveal d1"><div class="dot">📍</div><div><h3>Konuma sabitli sesler</h3><p>Her ses tam bırakıldığı koordinatta yaşar; harita üstünde canlı pin olarak görünür.</p></div></div>
+      <div class="feat reveal d2"><div class="dot">🔔</div><div><h3>Yaklaşınca hatırlat</h3><p>Bir sesin konumuna girdiğinde bildirim al — uygulama kapalıyken bile.</p></div></div>
+      <div class="feat reveal d1"><div class="dot">👥</div><div><h3>Arkadaşlarınla paylaş</h3><p>Sesleri sadece kendine sakla, arkadaşlarına ya da herkese aç. Kontrol tamamen sende.</p></div></div>
+      <div class="feat reveal d2"><div class="dot">🔒</div><div><h3>Gizlilik önce</h3><p>Reklam yok, izleme yok, veri satışı yok. Konumun yalnızca bu deneyim için kullanılır.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Anlar (mock) ─────────────────────────────────── -->
+<section class="moments-band">
+  <div class="wrap">
+    <div class="sec-tag reveal">Örnek anlar</div>
+    <h2 class="reveal d1">İnsanlar buralara ne bıraktı?</h2>
+    <p class="sub reveal d2">Bir bankta, bir sokakta, bir sahilde… her pin küçük bir hikâye.</p>
+    <div class="moments">
+      <div class="moment reveal d1">
+        <span class="m-loc">📍 Moda Sahili</span>
+        <p class="m-quote">"Burada ilk kez elini tuttum. Sen de bir gün gelirsen bu sesi bulursun."</p>
+        <div class="m-wave"><i style="height:40%"></i><i style="height:70%"></i><i style="height:95%"></i><i style="height:55%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:60%"></i><i style="height:90%"></i><i style="height:45%"></i><i style="height:72%"></i><i style="height:30%"></i><i style="height:58%"></i></div>
+        <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#3CD6C4">E</span> Ela</span><span>0:18 · 2 gün önce</span></div>
       </div>
-      <div class="feat">
-        <div class="dot">🔔</div>
-        <div><h3>Yaklaşınca hatırlat</h3><p>Bir sesin konumuna girdiğinde bildirim al — uygulama kapalıyken bile.</p></div>
+      <div class="moment reveal d2">
+        <span class="m-loc">📍 Kadıköy · Tren durağı</span>
+        <p class="m-quote">"Her sabah bu perondan geçerken çalan şarkıyı bırakıyorum. Günün güzel geçsin."</p>
+        <div class="m-wave"><i style="height:30%"></i><i style="height:60%"></i><i style="height:85%"></i><i style="height:45%"></i><i style="height:95%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:38%"></i><i style="height:82%"></i><i style="height:55%"></i><i style="height:66%"></i><i style="height:42%"></i></div>
+        <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#15B5A4">M</span> Mert</span><span>0:24 · 5 gün önce</span></div>
       </div>
-      <div class="feat">
-        <div class="dot">👥</div>
-        <div><h3>Arkadaşlarınla paylaş</h3><p>Sesleri sadece kendine sakla, arkadaşlarına ya da herkese aç. Kontrol tamamen sende.</p></div>
-      </div>
-      <div class="feat">
-        <div class="dot">🔒</div>
-        <div><h3>Gizlilik önce</h3><p>Reklam yok, izleme yok, veri satışı yok. Konumun yalnızca bu deneyim için kullanılır.</p></div>
+      <div class="moment reveal d3">
+        <span class="m-loc">📍 Cihangir · O kahve</span>
+        <p class="m-quote">"Buradaki masamıza küçük bir teşekkür bıraktım. Umarım gelen kişi gülümser."</p>
+        <div class="m-wave"><i style="height:50%"></i><i style="height:75%"></i><i style="height:40%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:68%"></i><i style="height:48%"></i><i style="height:88%"></i><i style="height:52%"></i><i style="height:62%"></i></div>
+        <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#3CD6C4">Z</span> Zeynep</span><span>0:12 · bugün</span></div>
       </div>
     </div>
+    <p style="text-align:center; color:var(--tx-lo); font-size:12.5px; margin-top:22px;">* Örnek gösterim içeriğidir.</p>
   </div>
 </section>
 
 <!-- ── Gizlilik bandı ────────────────────────────────── -->
 <section class="privacy-band">
   <div class="wrap" style="text-align:center;">
-    <div class="section-tag">Söz veriyoruz</div>
-    <h2>Verin sende kalır</h2>
-    <p class="sub">Linger reklam göstermez, üçüncü taraf izleme kullanmaz ve kişisel verilerini satmaz.</p>
-    <div class="chips">
-      <span class="chip">Reklam yok</span>
-      <span class="chip">İzleme (tracking) yok</span>
-      <span class="chip">Veri satışı yok</span>
-      <span class="chip">İstediğinde hesabını sil</span>
+    <div class="sec-tag reveal">Söz veriyoruz</div>
+    <h2 class="reveal d1">Verin sende kalır</h2>
+    <p class="sub reveal d2">Linger reklam göstermez, üçüncü taraf izleme kullanmaz ve kişisel verilerini satmaz.</p>
+    <div class="chips reveal d3">
+      <span class="chip">Reklam yok</span><span class="chip">İzleme (tracking) yok</span>
+      <span class="chip">Veri satışı yok</span><span class="chip">İstediğinde hesabını sil</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── İndir CTA ─────────────────────────────────────── -->
+<section id="indir" class="download">
+  <div class="wrap">
+    <div class="dl-card reveal">
+      <svg width="60" height="75" viewBox="0 0 100 125" style="filter:drop-shadow(0 8px 24px rgba(21,181,164,.4))" aria-hidden="true">
+        <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
+        <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
+        <rect x="47" y="23" width="6" height="28" rx="3" fill="#fff"/><rect x="58" y="27" width="6" height="20" rx="3" fill="#fff"/>
+        <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
+      </svg>
+      <h2 style="margin-top:18px;">Sesini bırakmaya hazır mısın?</h2>
+      <p class="sub" style="margin-bottom:28px;">Linger yakında App Store'da. İlk bırakılan sesler senin olsun.</p>
+      <a class="appstore-btn soon" id="appstore-cta" href="#indir" style="margin:0 auto;" aria-label="App Store'dan indir (yakında)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
+        <span><span class="as-sub">İndir —</span><br><span class="as-main">App Store</span></span>
+        <span class="soon-tag">Yakında</span>
+      </a>
     </div>
   </div>
 </section>
@@ -185,6 +337,29 @@
   </div>
   <div class="copy">© 2026 Linger · Tüm hakları saklıdır.</div>
 </footer>
+
+<script>
+  // Nav kenarlığı — sayfa kaydırılınca belirir
+  var nav = document.getElementById('nav');
+  var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Scroll-reveal
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.14 });
+  document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { io.observe(el); });
+
+  // App Store butonu henüz "soon": tıklayınca navigasyon yerine "İndir" bölümüne kaydır.
+  // Gerçek App Store URL'i girilip "soon" sınıfı kaldırılınca bu davranış kendiliğinden devre dışı kalır.
+  document.querySelectorAll('.appstore-btn.soon').forEach(function (btn) {
+    btn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      var t = document.getElementById('indir');
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
 
 </body>
 </html>
