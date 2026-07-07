@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linger — Bıraktığın ses, bıraktığın yerde.</title>
+<meta name="description" content="Linger, konum tabanlı bir sesli not uygulamasıdır. Bir yerde ses bırak, o yere döndüğünde yeniden dinle. Mekânın hafızası.">
+<meta property="og:title" content="Linger — Bıraktığın ses, bıraktığın yerde.">
+<meta property="og:description" content="Konum tabanlı sesli not uygulaması. Bir yere ses bırak; oraya döndüğünde bildirim al ve dinle.">
+<meta property="og:type" content="website">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0E1418; color: #C7D2D6;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65; font-size: 17px; -webkit-font-smoothing: antialiased;
+  }
+  a { color: #3CD6C4; text-decoration: none; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 22px; }
+
+  /* ── Hero ─────────────────────────────────────────── */
+  .hero {
+    position: relative; overflow: hidden;
+    padding: 96px 22px 88px; text-align: center;
+    background:
+      radial-gradient(700px 420px at 50% -10%, rgba(21,181,164,0.16), transparent 70%),
+      #0E1418;
+  }
+  .hero .logo { display: inline-block; filter: drop-shadow(0 8px 26px rgba(21,181,164,0.35)); }
+  .brand { font-size: 44px; font-weight: 800; letter-spacing: -1px; color: #EAF0F1; margin-top: 22px; }
+  .tag { font-size: 20px; color: #8DA0A8; margin-top: 10px; font-weight: 500; }
+  .lead { max-width: 620px; margin: 26px auto 0; font-size: 18px; color: #A9B8BE; }
+  .cta-row { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 26px; border-radius: 999px; font-weight: 700; font-size: 16px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary { background: #15B5A4; color: #05201D; box-shadow: 0 10px 30px rgba(21,181,164,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(21,181,164,0.45); }
+  .btn-ghost { border: 1px solid #2A363D; color: #EAF0F1; }
+  .btn-ghost:hover { border-color: #3CD6C4; }
+
+  /* ── Sections ─────────────────────────────────────── */
+  section { padding: 72px 0; }
+  .section-tag { text-transform: uppercase; letter-spacing: 2px; font-size: 13px; font-weight: 700; color: #3CD6C4; text-align: center; }
+  h2 { color: #EAF0F1; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; text-align: center; margin: 10px 0 8px; }
+  .sub { text-align: center; color: #8DA0A8; max-width: 560px; margin: 0 auto 44px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card {
+    background: #161E23; border: 1px solid #2A363D; border-radius: 18px; padding: 30px 24px;
+  }
+  .card .num {
+    width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: rgba(21,181,164,0.14); color: #3CD6C4; font-weight: 800; font-size: 18px; margin-bottom: 16px;
+  }
+  .card h3 { color: #EAF0F1; font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+  .card p { color: #A9B8BE; font-size: 15.5px; }
+
+  .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .feat { display: flex; gap: 16px; align-items: flex-start; background: #12191E; border: 1px solid #212C33; border-radius: 16px; padding: 22px; }
+  .feat .dot { flex: none; width: 40px; height: 40px; border-radius: 11px; background: rgba(60,214,196,0.12); display: flex; align-items: center; justify-content: center; }
+  .feat h3 { color: #EAF0F1; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .feat p { color: #93A4AB; font-size: 15px; }
+
+  .privacy-band { background: linear-gradient(180deg, #12191E, #0E1418); border-top: 1px solid #212C33; border-bottom: 1px solid #212C33; }
+  .privacy-band .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+  .chip { background: #161E23; border: 1px solid #2A363D; border-radius: 999px; padding: 10px 18px; font-size: 14.5px; color: #C7D2D6; font-weight: 600; }
+
+  /* ── Footer ───────────────────────────────────────── */
+  footer { padding: 56px 22px 64px; border-top: 1px solid #212C33; text-align: center; }
+  .foot-brand { font-size: 22px; font-weight: 800; color: #EAF0F1; letter-spacing: -0.5px; }
+  .foot-links { margin: 20px 0 18px; display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; }
+  .foot-links a { color: #8DA0A8; font-weight: 600; font-size: 15px; }
+  .foot-links a:hover { color: #3CD6C4; }
+  .copy { color: #5C6E76; font-size: 13px; }
+
+  @media (max-width: 720px) {
+    .steps, .features { grid-template-columns: 1fr; }
+    .brand { font-size: 36px; } .tag { font-size: 18px; } h2 { font-size: 25px; }
+    section { padding: 56px 0; } .hero { padding: 72px 22px 64px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ─────────────────────────────────────────── -->
+<div class="hero">
+  <svg class="logo" width="84" height="105" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linger">
+    <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
+    <rect x="25" y="31" width="6" height="12" rx="3" fill="#FFFFFF"/>
+    <rect x="36" y="27" width="6" height="20" rx="3" fill="#FFFFFF"/>
+    <rect x="47" y="23" width="6" height="28" rx="3" fill="#FFFFFF"/>
+    <rect x="58" y="27" width="6" height="20" rx="3" fill="#FFFFFF"/>
+    <rect x="69" y="31" width="6" height="12" rx="3" fill="#FFFFFF"/>
+  </svg>
+  <div class="brand">Linger</div>
+  <div class="tag">Bıraktığın ses, bıraktığın yerde.</div>
+  <p class="lead">Linger, mekânın hafızasını sese dönüştürür. Bir yerde küçük bir ses bırak; oraya geri döndüğünde Linger sana hatırlatır ve o anı yeniden dinlersin.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#nasil">Nasıl çalışır?</a>
+    <a class="btn btn-ghost" href="mailto:support@lingerapp.live">İletişim</a>
+  </div>
+</div>
+
+<!-- ── Nasıl çalışır ─────────────────────────────────── -->
+<section id="nasil">
+  <div class="wrap">
+    <div class="section-tag">Üç adım</div>
+    <h2>Sesini bir yere bırak</h2>
+    <p class="sub">Not tutmak gibi, ama sesle ve o ana ait olduğu yere sabitlenmiş.</p>
+    <div class="steps">
+      <div class="card">
+        <div class="num">1</div>
+        <h3>Kaydet</h3>
+        <p>Bulunduğun yerde tek dokunuşla sesli bir not kaydet. Konumu otomatik olarak o ana sabitlenir.</p>
+      </div>
+      <div class="card">
+        <div class="num">2</div>
+        <h3>Bırak</h3>
+        <p>Sesin haritada o noktada bekler. Sadece sen, arkadaşların ya da herkes duysun — sen seç.</p>
+      </div>
+      <div class="card">
+        <div class="num">3</div>
+        <h3>Yeniden yaşa</h3>
+        <p>O yere yaklaştığında Linger sana bildirim gönderir. Anıyı bıraktığın yerde, tam da orada dinlersin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Özellikler ────────────────────────────────────── -->
+<section style="background:#0B1013;">
+  <div class="wrap">
+    <div class="section-tag">Özellikler</div>
+    <h2>Küçük bir uygulama, büyük anlar</h2>
+    <p class="sub">Konumun etrafında dönen sade ve samimi bir deneyim.</p>
+    <div class="features">
+      <div class="feat">
+        <div class="dot">📍</div>
+        <div><h3>Konuma sabitli sesler</h3><p>Her ses tam bırakıldığı koordinatta yaşar; harita üstünde canlı pin olarak görünür.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">🔔</div>
+        <div><h3>Yaklaşınca hatırlat</h3><p>Bir sesin konumuna girdiğinde bildirim al — uygulama kapalıyken bile.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">👥</div>
+        <div><h3>Arkadaşlarınla paylaş</h3><p>Sesleri sadece kendine sakla, arkadaşlarına ya da herkese aç. Kontrol tamamen sende.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">🔒</div>
+        <div><h3>Gizlilik önce</h3><p>Reklam yok, izleme yok, veri satışı yok. Konumun yalnızca bu deneyim için kullanılır.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Gizlilik bandı ────────────────────────────────── -->
+<section class="privacy-band">
+  <div class="wrap" style="text-align:center;">
+    <div class="section-tag">Söz veriyoruz</div>
+    <h2>Verin sende kalır</h2>
+    <p class="sub">Linger reklam göstermez, üçüncü taraf izleme kullanmaz ve kişisel verilerini satmaz.</p>
+    <div class="chips">
+      <span class="chip">Reklam yok</span>
+      <span class="chip">İzleme (tracking) yok</span>
+      <span class="chip">Veri satışı yok</span>
+      <span class="chip">İstediğinde hesabını sil</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────── -->
+<footer>
+  <div class="foot-brand">Linger</div>
+  <div class="foot-links">
+    <a href="./privacy.html">Gizlilik Politikası</a>
+    <a href="./terms.html">Kullanım Koşulları</a>
+    <a href="./eula.html">Lisans Sözleşmesi (EULA)</a>
+    <a href="mailto:support@lingerapp.live">Destek</a>
+  </div>
+  <div class="copy">© 2026 Linger · Tüm hakları saklıdır.</div>
+</footer>
+
+</body>
+</html>
