@@ -8,6 +8,7 @@
 <meta property="og:title" content="Linger — Bıraktığın ses, bıraktığın yerde.">
 <meta property="og:description" content="Konum tabanlı sesli not uygulaması. Bir yere ses bırak; oraya döndüğünde bildirim al ve dinle.">
 <meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
@@ -39,10 +40,43 @@
     background: rgba(14,20,24,.72); border-bottom: 1px solid transparent; transition: border-color .3s; }
   nav.scrolled { border-color: var(--line2); }
   .nav-in { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  .nav-left { display:flex; align-items:center; gap:14px; }
   .nav-brand { display:flex; align-items:center; gap:10px; font-weight:800; color:var(--tx-hi); font-size:19px; letter-spacing:-.4px; }
   .nav-cta { font-size:14.5px; font-weight:700; padding:9px 16px; border-radius:999px; background:var(--teal); color:#05201D;
     transition: transform .15s, box-shadow .15s; }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4); }
+
+  /* ── Sol menü (hamburger + slide-in drawer) ─────────── */
+  .menu-btn { flex:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px;
+    width:34px; height:34px; border-radius:10px; background:transparent; border:1px solid transparent; cursor:pointer;
+    transition: background .2s, border-color .2s; }
+  .menu-btn:hover { background: var(--card); border-color: var(--line); }
+  .menu-btn span { display:block; width:17px; height:2px; background: var(--tx-hi); border-radius:2px;
+    transition: transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s; }
+  .menu-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2) { opacity: 0; }
+  .menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .drawer-backdrop { position:fixed; inset:0; background:rgba(6,10,12,.62); backdrop-filter: blur(2px);
+    z-index:90; opacity:0; pointer-events:none; transition: opacity .3s; }
+  .drawer-backdrop.open { opacity:1; pointer-events:auto; }
+  .drawer { position:fixed; top:0; left:0; bottom:0; width:290px; max-width:84vw; background: var(--card2);
+    border-right:1px solid var(--line); z-index:95; transform: translateX(-100%);
+    transition: transform .34s cubic-bezier(.2,.8,.2,1); display:flex; flex-direction:column; padding:24px 20px; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+  .drawer-brand { display:flex; align-items:center; gap:9px; font-weight:800; color:var(--tx-hi); font-size:18px; }
+  .drawer-close { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    color: var(--tx-mid); background:transparent; border:1px solid var(--line); cursor:pointer; transition: color .2s, border-color .2s; }
+  .drawer-close:hover { color: var(--tx-hi); border-color: var(--teal2); }
+  .drawer-links { display:flex; flex-direction:column; gap:3px; }
+  .drawer-links a { padding:12px 12px; border-radius:12px; color:var(--tx); font-weight:600; font-size:15.5px;
+    transition: background .2s, color .2s; }
+  .drawer-links a:hover { background: var(--card); color: var(--teal2); }
+  .drawer-sep { height:1px; background:var(--line2); margin:18px 2px; }
+  .drawer-foot { margin-top:auto; display:flex; flex-direction:column; gap:2px; }
+  .drawer-foot a { padding:9px 12px; color: var(--tx-mid); font-size:13.5px; font-weight:600; border-radius:10px; transition: color .2s, background .2s; }
+  .drawer-foot a:hover { color: var(--teal2); background: var(--card); }
 
   /* ── Hero ─────────────────────────────────────────── */
   .hero { position: relative; overflow: hidden; padding: 70px 22px 40px;
@@ -70,25 +104,36 @@
   .appstore-btn.soon { cursor: default; }
 
   /* ── Phone mockup ─────────────────────────────────── */
-  .device-col { display:flex; justify-content:center; }
-  .phone { position: relative; width: 288px; height: 592px; border-radius: 46px; padding: 12px;
+  .device-col { display:flex; justify-content:center; position:relative; }
+  .phone-glow { position:absolute; top:50%; left:50%; width:360px; height:360px; border-radius:50%; z-index:0;
+    background: radial-gradient(circle, rgba(21,181,164,.38), transparent 70%); filter: blur(18px);
+    animation: glowPulse 5s ease-in-out infinite; }
+  @keyframes glowPulse { 0%,100%{ opacity:.5; transform:translate(-50%,-50%) scale(.9) } 50%{ opacity:.95; transform:translate(-50%,-50%) scale(1.08) } }
+  .phone { position: relative; z-index:1; width: 288px; height: 592px; border-radius: 46px; padding: 12px;
     background: linear-gradient(160deg,#20303a,#0c1216); box-shadow: 0 40px 90px -30px rgba(0,0,0,.8), inset 0 0 0 1.5px #2c3b44;
-    animation: floaty 6s ease-in-out infinite; }
-  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    animation: floaty 7s ease-in-out infinite; }
+  @keyframes floaty { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-22px) rotate(-1.4deg)} }
   .screen { position:absolute; inset:12px; border-radius:36px; overflow:hidden;
     background: radial-gradient(120% 80% at 30% 10%, #14212a, #0b1116 60%); }
   .notch { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:104px; height:26px; border-radius:0 0 16px 16px; background:#0a0f13; z-index:6; }
   /* mini map grid */
   .map { position:absolute; inset:0; opacity:.9;
     background-image: linear-gradient(rgba(60,214,196,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(60,214,196,.06) 1px, transparent 1px);
-    background-size: 34px 34px; }
+    background-size: 34px 34px; animation: mapDrift 14s linear infinite; }
+  @keyframes mapDrift { 0%{ background-position: 0 0, 0 0 } 100%{ background-position: 34px 34px, 34px 34px } }
   .map::after { content:''; position:absolute; inset:0; background: radial-gradient(60% 45% at 50% 38%, rgba(21,181,164,.16), transparent 70%); }
-  /* pins */
-  .pin { position:absolute; width:26px; height:33px; transform: translate(-50%,-100%); filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
-  .pin.p1 { left:32%; top:34%; } .pin.p2 { left:64%; top:28%; } .pin.p3 { left:52%; top:52%; } .pin.p4 { left:74%; top:56%; }
+  /* pins — gentle continuous bob so the map feels alive even before scroll */
+  .pin { position:absolute; width:26px; height:33px; transform: translate(-50%,-100%); filter: drop-shadow(0 6px 10px rgba(0,0,0,.5));
+    animation: pinBob 3.2s ease-in-out infinite; transform-origin: bottom center; }
+  @keyframes pinBob { 0%,100%{ transform: translate(-50%,-100%) translateY(0) scale(1) } 50%{ transform: translate(-50%,-100%) translateY(-6px) scale(1.05) } }
+  .pin.p1 { left:32%; top:34%; animation-delay: 0s; }
+  .pin.p2 { left:64%; top:28%; animation-delay: .7s; }
+  .pin.p3 { left:52%; top:52%; animation-delay: 1.4s; }
+  .pin.p4 { left:74%; top:56%; animation-delay: 2.1s; }
   /* sonar ping around active pin */
-  .sonar { position:absolute; left:52%; top:52%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid var(--teal2); animation: sonar 2.6s ease-out infinite; }
-  .sonar.s2 { animation-delay: 1.3s; }
+  .sonar { position:absolute; left:52%; top:52%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid var(--teal2); animation: sonar 2.7s ease-out infinite; }
+  .sonar.s2 { animation-delay: .9s; }
+  .sonar.s3 { animation-delay: 1.8s; }
   @keyframes sonar { 0%{opacity:.85; width:12px; height:12px} 100%{opacity:0; width:150px; height:150px} }
   /* now-playing card */
   .np { position:absolute; left:14px; right:14px; bottom:16px; background: rgba(22,30,35,.92); border:1px solid var(--line);
@@ -163,7 +208,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal { transition: none; opacity:1; transform:none; }
-    .phone, .sonar, .badge-dot, .wave i { animation: none !important; }
+    .phone, .sonar, .badge-dot, .wave i, .phone-glow, .pin, .map { animation: none !important; }
   }
 </style>
 </head>
@@ -176,8 +221,29 @@
 
 <nav id="nav">
   <div class="wrap nav-in">
-    <div class="nav-brand">
-      <svg width="26" height="32" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <div class="nav-left">
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-brand">
+        <svg width="26" height="32" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
+          <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
+          <rect x="47" y="23" width="6" height="28" rx="3" fill="#fff"/><rect x="58" y="27" width="6" height="20" rx="3" fill="#fff"/>
+          <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
+        </svg>
+        Linger
+      </div>
+    </div>
+    <a class="nav-cta appstore-jump" href="#indir">İndir</a>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="drawer-brand">
+      <svg width="24" height="30" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
         <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
         <rect x="47" y="23" width="6" height="28" rx="3" fill="#fff"/><rect x="58" y="27" width="6" height="20" rx="3" fill="#fff"/>
@@ -185,9 +251,24 @@
       </svg>
       Linger
     </div>
-    <a class="nav-cta appstore-jump" href="#indir">İndir</a>
+    <button class="drawer-close" id="drawerCloseBtn" type="button" aria-label="Menüyü kapat">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg>
+    </button>
   </div>
-</nav>
+  <div class="drawer-links">
+    <a href="#nasil">Nasıl çalışır</a>
+    <a href="#ozellikler">Özellikler</a>
+    <a href="#anlar">Örnek anlar</a>
+    <a href="#indir">İndir</a>
+  </div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-foot">
+    <a href="./privacy.html">Gizlilik Politikası</a>
+    <a href="./terms.html">Kullanım Koşulları</a>
+    <a href="./eula.html">Lisans Sözleşmesi (EULA)</a>
+    <a href="mailto:support@lingerapp.live">Destek</a>
+  </div>
+</aside>
 
 <!-- ── Hero ─────────────────────────────────────────── -->
 <div class="hero">
@@ -210,11 +291,12 @@
     </div>
 
     <div class="device-col reveal in d2">
+      <div class="phone-glow" aria-hidden="true"></div>
       <div class="phone">
         <div class="notch"></div>
         <div class="screen">
           <div class="map"></div>
-          <div class="sonar"></div><div class="sonar s2"></div>
+          <div class="sonar"></div><div class="sonar s2"></div><div class="sonar s3"></div>
           <!-- pins -->
           <svg class="pin p1" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
           <svg class="pin p2" viewBox="0 0 100 125" aria-hidden="true"><path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#3CD6C4"/><rect x="30" y="30" width="7" height="14" rx="3.5" fill="#fff"/><rect x="43" y="24" width="7" height="26" rx="3.5" fill="#fff"/><rect x="56" y="30" width="7" height="14" rx="3.5" fill="#fff"/></svg>
@@ -248,7 +330,7 @@
 </section>
 
 <!-- ── Özellikler ────────────────────────────────────── -->
-<section style="background:var(--bg2);">
+<section id="ozellikler" style="background:var(--bg2);">
   <div class="wrap">
     <div class="sec-tag reveal">Özellikler</div>
     <h2 class="reveal d1">Küçük bir uygulama, büyük anlar</h2>
@@ -263,7 +345,7 @@
 </section>
 
 <!-- ── Anlar (mock) ─────────────────────────────────── -->
-<section class="moments-band">
+<section id="anlar" class="moments-band">
   <div class="wrap">
     <div class="sec-tag reveal">Örnek anlar</div>
     <h2 class="reveal d1">İnsanlar buralara ne bıraktı?</h2>
@@ -343,6 +425,27 @@
   var nav = document.getElementById('nav');
   var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 8); };
   onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Sol menü (drawer)
+  var menuBtn = document.getElementById('menuBtn');
+  var drawer = document.getElementById('drawer');
+  var drawerBackdrop = document.getElementById('drawerBackdrop');
+  var drawerCloseBtn = document.getElementById('drawerCloseBtn');
+  function openDrawer() {
+    drawer.classList.add('open'); drawerBackdrop.classList.add('open'); menuBtn.classList.add('open');
+    menuBtn.setAttribute('aria-expanded', 'true'); drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    drawer.classList.remove('open'); drawerBackdrop.classList.remove('open'); menuBtn.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false'); drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  menuBtn.addEventListener('click', function () { drawer.classList.contains('open') ? closeDrawer() : openDrawer(); });
+  drawerBackdrop.addEventListener('click', closeDrawer);
+  drawerCloseBtn.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.drawer-links a, .drawer-foot a').forEach(function (a) { a.addEventListener('click', closeDrawer); });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
 
   // Scroll-reveal
   var io = new IntersectionObserver(function (entries) {
