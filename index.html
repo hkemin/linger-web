@@ -52,7 +52,7 @@
   .nav-brand:hover { opacity:.8; }
   .nav-cta { font-size:14.5px; font-weight:700; padding:9px 16px; border-radius:999px; background:var(--teal); color:#05201D;
     transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .15s; }
-  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4); }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4), 0 16px 22px -10px rgba(21,181,164,.5); }
 
   /* ── Sol menü (hamburger + slide-in drawer) ─────────── */
   .menu-btn { flex:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px;
@@ -115,21 +115,23 @@
   .ghost-link { font-weight:700; color:var(--tx-hi); font-size:15.5px; display:inline-flex; align-items:center; gap:7px; }
   .ghost-link:hover { color: var(--teal2); }
 
-  /* App Store button — magnetik hover (JS, transform) + tıklanınca/hoverda geçen ince ışık huzmesi. */
-  .appstore-btn { display:inline-flex; align-items:center; gap:11px; padding:12px 20px 12px 18px; border-radius:14px;
-    background:#EAF0F1; color:#0B1013; position:relative; overflow:hidden;
+  /* App Store button — magnetik hover (JS, transform) + hoverda geçen ince ışık huzmesi + markanın
+     teal/yeşil "iz" parıltısı. NOT: overflow:hidden ÖNCEDEN doğrudan .appstore-btn'deydi — bu,
+     kutunun dışına taşan .soon-tag rozetini (top:-9px/right:-9px) KIRPIYORDU. Kırpma artık yalnızca
+     içerideki .as-clip sarmalayıcıda; rozet .appstore-btn'in doğrudan çocuğu olarak kırpılmadan kalıyor. */
+  .appstore-btn { display:inline-flex; align-items:center; border-radius:14px; background:#EAF0F1; color:#0B1013; position:relative;
     transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
-  .appstore-btn:hover { box-shadow: 0 16px 38px rgba(0,0,0,.42); }
-  .appstore-btn::before { content:''; position:absolute; top:0; left:0; width:40%; height:100%;
+  .appstore-btn:hover { box-shadow: 0 16px 38px rgba(0,0,0,.42), 0 22px 40px -18px rgba(21,181,164,.55); }
+  .as-clip { display:inline-flex; align-items:center; gap:11px; padding:12px 20px 12px 18px; border-radius:14px; overflow:hidden; position:relative; }
+  .as-clip::before { content:''; position:absolute; top:0; left:0; width:40%; height:100%;
     background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
     transform: skewX(-18deg) translateX(-250%); transition: transform .7s cubic-bezier(.2,.7,.2,1); pointer-events:none; }
-  .appstore-btn:hover::before { transform: skewX(-18deg) translateX(400%); }
+  .appstore-btn:hover .as-clip::before { transform: skewX(-18deg) translateX(400%); }
   .appstore-btn .as-sub { font-size:11px; line-height:1; opacity:.72; font-weight:600; }
   .appstore-btn .as-main { font-size:19px; line-height:1.15; font-weight:800; letter-spacing:-.3px; }
   .appstore-btn .soon-tag { position:absolute; top:-9px; right:-9px; background:var(--teal); color:#05201D; font-size:10.5px;
-    font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.3px; box-shadow:0 4px 12px rgba(21,181,164,.5); z-index:1; }
+    font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.3px; box-shadow:0 4px 12px rgba(21,181,164,.5); z-index:2; }
   .appstore-btn.soon { cursor: default; }
-  .appstore-btn > span, .appstore-btn > svg { position:relative; z-index:1; }
 
   /* ── Phone mockup ─────────────────────────────────── */
   .device-col { display:flex; justify-content:center; position:relative; }
@@ -207,8 +209,10 @@
 
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .card:hover { transform: translateY(-7px); border-color: rgba(60,214,196,.4); box-shadow: 0 18px 40px -18px rgba(0,0,0,.55); }
+  .card:hover { transform: translateY(-7px); border-color: rgba(60,214,196,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -18px rgba(0,0,0,.55), 0 26px 30px -20px rgba(21,181,164,.5); }
   .card .num { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
     background: rgba(21,181,164,.14); color: var(--teal2); font-weight: 800; font-size: 19px; margin-bottom: 16px;
     transition: transform .3s, box-shadow .3s; position:relative; }
@@ -218,8 +222,10 @@
 
   .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--card2); border: 1px solid var(--line2); border-radius: 16px; padding: 22px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .feat:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.35); box-shadow: 0 16px 34px -18px rgba(0,0,0,.5); }
+  .feat:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.35);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 16px 34px -18px rgba(0,0,0,.5), 0 22px 26px -18px rgba(21,181,164,.45); }
   .feat .dot { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(60,214,196,.12); display: flex; align-items: center; justify-content: center; font-size:20px;
     transition: transform .3s; position:relative; }
   .feat:hover .dot { transform: scale(1.1) rotate(-4deg); }
@@ -231,7 +237,8 @@
   .moments { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
   .moment { background: linear-gradient(165deg,var(--card),#121a1f); border:1px solid var(--line); border-radius:18px; padding:20px; overflow:hidden;
     transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .moment:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4); box-shadow: 0 18px 38px -18px rgba(0,0,0,.55); }
+  .moment:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4);
+    box-shadow: 0 18px 38px -18px rgba(0,0,0,.55), 0 24px 28px -20px rgba(21,181,164,.48); }
   .moment::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(21,181,164,.16),transparent 70%); }
   .m-loc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--teal2); font-weight:700; position:relative; }
   .m-quote { color:var(--tx-hi); font-size:16px; font-weight:600; margin:12px 0 14px; line-height:1.5; position:relative; }
@@ -253,19 +260,37 @@
     transition: transform .2s, border-color .2s, background .2s; }
   .chip:hover { transform: translateY(-2px); border-color: rgba(60,214,196,.5); background: var(--card2); }
 
-  /* Download CTA */
+  /* Download CTA — ÖNCEKİ sürüm conic-gradient + mask-composite ile "dönen kenarlık"
+     deniyordu; bu teknik tarayıcılar arası tutarsız render oluyor (özellikle yuvarlak
+     köşelerde kama gibi bozuk görünüyordu). Yerine telefonun arkasındaki .phone-glow ile
+     AYNI kanıtlanmış teknik (nabız gibi atan blurlu radial-gradient, dönme YOK — köşe
+     bozulması riski sıfır). */
   .download { text-align:center; position:relative; overflow:hidden;
     background: radial-gradient(600px 300px at 50% 120%, rgba(21,181,164,.18), transparent 70%); }
   .dl-card { max-width:720px; margin:0 auto; background:linear-gradient(160deg,var(--card),#101820); border:1px solid var(--line);
-    border-radius:28px; padding:52px 30px; position:relative; }
-  /* Yavaşça dönen gradient kenarlık — asıl CTA'yı ince bir ışıkla vurgular. mask ile
-     yalnızca 1px'lik "halka" boyanır, kart içeriği etkilenmez; transform-only, ucuz. */
-  .dl-card::before { content:''; position:absolute; inset:-1.5px; border-radius:29px; padding:1.5px;
-    background: conic-gradient(from 0deg, transparent 0%, rgba(60,214,196,.65) 18%, transparent 36%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    animation: dlBorderSpin 6s linear infinite; pointer-events:none; }
-  @keyframes dlBorderSpin { to { transform: rotate(360deg); } }
+    border-radius:28px; padding:56px 30px; position:relative; z-index:1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 30px 70px -24px rgba(0,0,0,.6); }
+  /* .dl-card'ın KARDEŞİ (çocuğu DEĞİL) — negatif z-index bir çocuk, ebeveyninin KENDİ
+     arka planının ÜSTÜNE boyanır (CSS boyama sırası: önce stacking context'i kuran
+     elemanın arka planı, SONRA negatif-z çocukları) — yani kartın koyu zemini üzerine
+     bulanık bir renk lekesi binerdi. Kardeş yapıp .dl-card'ın z-index:1'i doğal olarak
+     üstünde kalmasını sağlıyoruz — .phone-glow ile birebir aynı, kanıtlanmış desen. */
+  .dl-glow { position:absolute; left:50%; top:50%; width:640px; height:320px; z-index:0; pointer-events:none;
+    transform:translate(-50%,-50%) scale(.95); filter:blur(46px);
+    background:
+      radial-gradient(closest-side, rgba(21,181,164,.4), transparent 72%),
+      radial-gradient(closest-side, rgba(255,107,92,.16), transparent 72%) 68% 32% / 65% 65% no-repeat;
+    animation: dlGlowPulse 6s ease-in-out infinite; }
+  @keyframes dlGlowPulse { 0%,100%{ opacity:.65; transform:translate(-50%,-50%) scale(.95) } 50%{ opacity:1; transform:translate(-50%,-50%) scale(1.07) } }
+  /* Kart üstündeki logo — telefonla aynı "floaty" dilinde, çok daha küçük genlikle. */
+  .dl-icon { animation: dlIconFloat 4.5s ease-in-out infinite; }
+  @keyframes dlIconFloat { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } }
+  /* CTA butonunun etrafında dikkat çeken nabız halkası — pulseDot ile AYNI, kanıtlanmış
+     box-shadow tekniği (paint-only, layout tetiklemez). */
+  .dl-cta-wrap { position:relative; display:inline-block; }
+  .dl-cta-wrap::after { content:''; position:absolute; inset:0; border-radius:14px; pointer-events:none;
+    box-shadow:0 0 0 0 rgba(60,214,196,.45); animation: dlPulseRing 2.6s ease-out infinite; }
+  @keyframes dlPulseRing { 0%{ box-shadow:0 0 0 0 rgba(60,214,196,.45) } 70%{ box-shadow:0 0 0 14px rgba(60,214,196,0) } 100%{ box-shadow:0 0 0 0 rgba(60,214,196,0) } }
 
   /* Footer */
   footer { padding: 54px 22px 64px; border-top: 1px solid var(--line2); text-align: center; }
@@ -285,7 +310,7 @@
   @media (prefers-reduced-motion: reduce) {
     .reveal { transition: none; opacity:1; transform:none; filter:none; }
     .phone, .sonar, .badge-dot, .wave i, .phone-glow, .pin, .map,
-    .orb1, .orb2, .grad, .m-wave i, .dl-card::before { animation: none !important; }
+    .orb1, .orb2, .grad, .m-wave i, .dl-glow, .dl-icon, .dl-cta-wrap::after { animation: none !important; }
   }
 </style>
 </head>
@@ -360,10 +385,12 @@
       <p class="hero-lead reveal in d2">Linger, bir anı sese dönüştürüp tam da yaşandığı yere sabitler. Oraya geri döndüğünde Linger sana hatırlatır ve o anı yeniden dinlersin.</p>
       <div class="cta-row reveal in d3">
         <a class="appstore-btn soon" id="appstore-hero" href="#indir" aria-label="App Store'dan indir (yakında)">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
-          <span>
-            <span class="as-sub">İndir —</span><br>
-            <span class="as-main">App Store</span>
+          <span class="as-clip">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
+            <span>
+              <span class="as-sub">İndir —</span><br>
+              <span class="as-main">App Store</span>
+            </span>
           </span>
           <span class="soon-tag">Yakında</span>
         </a>
@@ -475,8 +502,9 @@
 <!-- ── İndir CTA ─────────────────────────────────────── -->
 <section id="indir" class="download">
   <div class="wrap">
+    <div class="dl-glow" aria-hidden="true"></div>
     <div class="dl-card reveal">
-      <svg width="60" height="75" viewBox="0 0 100 125" style="filter:drop-shadow(0 8px 24px rgba(21,181,164,.4))" aria-hidden="true">
+      <svg class="dl-icon" width="60" height="75" viewBox="0 0 100 125" style="filter:drop-shadow(0 8px 24px rgba(21,181,164,.4))" aria-hidden="true">
         <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
         <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
         <rect x="47" y="23" width="6" height="28" rx="3" fill="#fff"/><rect x="58" y="27" width="6" height="20" rx="3" fill="#fff"/>
@@ -484,11 +512,15 @@
       </svg>
       <h2 style="margin-top:18px;">Sesini bırakmaya hazır mısın?</h2>
       <p class="sub" style="margin-bottom:28px;">Linger yakında App Store'da. İlk bırakılan sesler senin olsun.</p>
-      <a class="appstore-btn soon" id="appstore-cta" href="#indir" style="margin:0 auto;" aria-label="App Store'dan indir (yakında)">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
-        <span><span class="as-sub">İndir —</span><br><span class="as-main">App Store</span></span>
-        <span class="soon-tag">Yakında</span>
-      </a>
+      <span class="dl-cta-wrap">
+        <a class="appstore-btn soon" id="appstore-cta" href="#indir" aria-label="App Store'dan indir (yakında)">
+          <span class="as-clip">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#0B1013" aria-hidden="true"><path d="M16.36 12.3c-.02-2.05 1.68-3.03 1.75-3.08-.95-1.4-2.44-1.59-2.97-1.61-1.26-.13-2.47.74-3.11.74-.64 0-1.63-.72-2.68-.7-1.38.02-2.65.8-3.36 2.03-1.43 2.49-.37 6.17 1.03 8.19.68.99 1.49 2.1 2.55 2.06 1.02-.04 1.41-.66 2.65-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-1 2.47-2 .78-1.15 1.1-2.26 1.11-2.32-.02-.01-2.13-.82-2.15-3.25zM14.3 6.24c.56-.68.94-1.62.84-2.57-.81.03-1.79.54-2.37 1.22-.52.6-.98 1.56-.86 2.48.9.07 1.83-.46 2.39-1.13z"/></svg>
+            <span><span class="as-sub">İndir —</span><br><span class="as-main">App Store</span></span>
+          </span>
+          <span class="soon-tag">Yakında</span>
+        </a>
+      </span>
     </div>
   </div>
 </section>
