@@ -41,7 +41,9 @@
   nav.scrolled { border-color: var(--line2); }
   .nav-in { display:flex; align-items:center; justify-content:space-between; height:62px; }
   .nav-left { display:flex; align-items:center; gap:14px; }
-  .nav-brand { display:flex; align-items:center; gap:10px; font-weight:800; color:var(--tx-hi); font-size:19px; letter-spacing:-.4px; }
+  .nav-brand { display:flex; align-items:center; gap:10px; font-weight:800; color:var(--tx-hi); font-size:19px; letter-spacing:-.4px;
+    transition: opacity .15s; }
+  .nav-brand:hover { opacity:.8; }
   .nav-cta { font-size:14.5px; font-weight:700; padding:9px 16px; border-radius:999px; background:var(--teal); color:#05201D;
     transition: transform .15s, box-shadow .15s; }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4); }
@@ -57,15 +59,21 @@
   .menu-btn.open span:nth-child(2) { opacity: 0; }
   .menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-  .drawer-backdrop { position:fixed; inset:0; background:rgba(6,10,12,.62); backdrop-filter: blur(2px);
+  /* NOT: backdrop-filter kasıtlı olarak KULLANILMIYOR — tam ekran blur, drawer'ın
+     transform geçişiyle aynı anda her karede yeniden hesaplanıp GPU'yu tıkıyor ve
+     "kare kare" takılma hissi veriyordu. Düz yarı saydam katman aynı görsel etkiyi
+     çok daha ucuza (compositor-only) veriyor. */
+  .drawer-backdrop { position:fixed; inset:0; background:rgba(6,10,12,.68);
     z-index:90; opacity:0; pointer-events:none; transition: opacity .3s; }
   .drawer-backdrop.open { opacity:1; pointer-events:auto; }
   .drawer { position:fixed; top:0; left:0; bottom:0; width:290px; max-width:84vw; background: var(--card2);
-    border-right:1px solid var(--line); z-index:95; transform: translateX(-100%);
+    border-right:1px solid var(--line); z-index:95; transform: translate3d(-100%,0,0); will-change: transform;
     transition: transform .34s cubic-bezier(.2,.8,.2,1); display:flex; flex-direction:column; padding:24px 20px; }
-  .drawer.open { transform: translateX(0); }
+  .drawer.open { transform: translate3d(0,0,0); }
   .drawer-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
-  .drawer-brand { display:flex; align-items:center; gap:9px; font-weight:800; color:var(--tx-hi); font-size:18px; }
+  .drawer-brand { display:flex; align-items:center; gap:9px; font-weight:800; color:var(--tx-hi); font-size:18px;
+    transition: opacity .15s; }
+  .drawer-brand:hover { opacity:.8; }
   .drawer-close { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
     color: var(--tx-mid); background:transparent; border:1px solid var(--line); cursor:pointer; transition: color .2s, border-color .2s; }
   .drawer-close:hover { color: var(--tx-hi); border-color: var(--teal2); }
@@ -109,13 +117,25 @@
     background: radial-gradient(circle, rgba(21,181,164,.38), transparent 70%); filter: blur(18px);
     animation: glowPulse 5s ease-in-out infinite; }
   @keyframes glowPulse { 0%,100%{ opacity:.5; transform:translate(-50%,-50%) scale(.9) } 50%{ opacity:.95; transform:translate(-50%,-50%) scale(1.08) } }
-  .phone { position: relative; z-index:1; width: 288px; height: 592px; border-radius: 46px; padding: 12px;
-    background: linear-gradient(160deg,#20303a,#0c1216); box-shadow: 0 40px 90px -30px rgba(0,0,0,.8), inset 0 0 0 1.5px #2c3b44;
+  /* Titanyum çerçeve (iPhone Pro tarzı) — ince bezel, brushed-metal gradyan, ince parlak kenar. */
+  .phone { position: relative; z-index:1; width: 284px; height: 592px; border-radius: 54px; padding: 9px;
+    background: linear-gradient(155deg,#4c4c50,#28282b 55%,#151517);
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,.8), inset 0 0 0 1.5px rgba(255,255,255,.09), inset 0 0 0 3px #0a0a0b;
     animation: floaty 7s ease-in-out infinite; }
   @keyframes floaty { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-22px) rotate(-1.4deg)} }
-  .screen { position:absolute; inset:12px; border-radius:36px; overflow:hidden;
+  /* Yan tuşlar (Action Button, ses tuşları solda; güç tuşu sağda) — sabit, düşük maliyetli detay. */
+  .btn-action, .btn-vol, .btn-power { position:absolute; background:linear-gradient(90deg,#3a3a3d,#57575b); border-radius:3px; z-index:2; }
+  .btn-action { left:-3px; top:92px; width:3px; height:26px; }
+  .btn-vol { left:-3px; width:3px; height:42px; }
+  .btn-vol.v1 { top:134px; } .btn-vol.v2 { top:188px; }
+  .btn-power { right:-3px; top:148px; width:3px; height:66px; }
+  .screen { position:absolute; inset:9px; border-radius:46px; overflow:hidden;
     background: radial-gradient(120% 80% at 30% 10%, #14212a, #0b1116 60%); }
-  .notch { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:104px; height:26px; border-radius:0 0 16px 16px; background:#0a0f13; z-index:6; }
+  /* Dynamic Island — ekranın içinde yüzen hap + minik kamera noktası. */
+  .island { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:92px; height:27px;
+    border-radius:16px; background:#050506; z-index:6; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+  .island::after { content:''; position:absolute; top:50%; right:13px; width:7px; height:7px; border-radius:50%;
+    background:#141a1c; transform:translateY(-50%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
   /* mini map grid */
   .map { position:absolute; inset:0; opacity:.9;
     background-image: linear-gradient(rgba(60,214,196,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(60,214,196,.06) 1px, transparent 1px);
@@ -130,11 +150,16 @@
   .pin.p2 { left:64%; top:28%; animation-delay: .7s; }
   .pin.p3 { left:52%; top:52%; animation-delay: 1.4s; }
   .pin.p4 { left:74%; top:56%; animation-delay: 2.1s; }
-  /* sonar ping around active pin */
-  .sonar { position:absolute; left:52%; top:52%; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid var(--teal2); animation: sonar 2.7s ease-out infinite; }
+  /* sonar ping around active pin — transform/opacity ONLY (compositor-friendly).
+     Önceki sürüm width/height animasyonluydu → her karede layout yeniden hesaplanıyordu,
+     mobilde "glitch/kekeme" görünümün sebebi buydu. Merkezleme artık negatif margin ile
+     sabit, transform tamamen scale animasyonuna ayrıldı. */
+  .sonar { position:absolute; left:52%; top:52%; width:14px; height:14px; margin:-7px 0 0 -7px;
+    border-radius:50%; border:2px solid var(--teal2); will-change: transform, opacity;
+    animation: sonar 2.7s ease-out infinite; }
   .sonar.s2 { animation-delay: .9s; }
   .sonar.s3 { animation-delay: 1.8s; }
-  @keyframes sonar { 0%{opacity:.85; width:12px; height:12px} 100%{opacity:0; width:150px; height:150px} }
+  @keyframes sonar { 0%{ transform:scale(1); opacity:.85 } 100%{ transform:scale(10.7); opacity:0 } }
   /* now-playing card */
   .np { position:absolute; left:14px; right:14px; bottom:16px; background: rgba(22,30,35,.92); border:1px solid var(--line);
     border-radius:18px; padding:12px 13px; display:flex; align-items:center; gap:11px; backdrop-filter: blur(6px); box-shadow:0 12px 30px rgba(0,0,0,.5); }
@@ -225,7 +250,7 @@
       <button class="menu-btn" id="menuBtn" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="drawer">
         <span></span><span></span><span></span>
       </button>
-      <div class="nav-brand">
+      <a class="nav-brand" href="/" aria-label="Linger anasayfa">
         <svg width="26" height="32" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
           <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
@@ -233,7 +258,7 @@
           <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
         </svg>
         Linger
-      </div>
+      </a>
     </div>
     <a class="nav-cta appstore-jump" href="#indir">İndir</a>
   </div>
@@ -242,7 +267,7 @@
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
   <div class="drawer-head">
-    <div class="drawer-brand">
+    <a class="drawer-brand" href="/" aria-label="Linger anasayfa">
       <svg width="24" height="30" viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M80.69 49.13 A33 33 0 1 0 19.31 49.13 L42.56 107.94 A8 8 0 0 0 57.44 107.94 Z" fill="#15B5A4"/>
         <rect x="25" y="31" width="6" height="12" rx="3" fill="#fff"/><rect x="36" y="27" width="6" height="20" rx="3" fill="#fff"/>
@@ -250,7 +275,7 @@
         <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
       </svg>
       Linger
-    </div>
+    </a>
     <button class="drawer-close" id="drawerCloseBtn" type="button" aria-label="Menüyü kapat">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg>
     </button>
@@ -293,7 +318,11 @@
     <div class="device-col reveal in d2">
       <div class="phone-glow" aria-hidden="true"></div>
       <div class="phone">
-        <div class="notch"></div>
+        <span class="btn-action" aria-hidden="true"></span>
+        <span class="btn-vol v1" aria-hidden="true"></span>
+        <span class="btn-vol v2" aria-hidden="true"></span>
+        <span class="btn-power" aria-hidden="true"></span>
+        <div class="island" aria-hidden="true"></div>
         <div class="screen">
           <div class="map"></div>
           <div class="sonar"></div><div class="sonar s2"></div><div class="sonar s3"></div>
