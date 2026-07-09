@@ -201,18 +201,36 @@
   /* Cursor-spotlight hover — .card/.feat/.moment ortak: fare pozisyonu JS ile --mx/--my'ye
      yazılır, ::after bunu radial-gradient olarak gösterir. Yalnızca opacity geçişi (ucuz),
      hover dışında pointer-events:none. */
-  .card, .feat, .moment { --mx:50%; --my:50%; position:relative; }
+  /* height:100% — .slot grid hücresi olarak satırın en uzun kartına göre gerilir (grid
+     varsayılan stretch); .card/.feat/.moment de aynı yüksekliğe uzanmazsa, .stack-shadow
+     (.slot'a inset:0) görünür karttan daha uzun/kısa kalır, hoverda hizası bozuk görünür. */
+  .card, .feat, .moment { --mx:50%; --my:50%; position:relative; z-index:1; height:100%; }
   .card::after, .feat::after, .moment::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
     background: radial-gradient(240px circle at var(--mx) var(--my), rgba(60,214,196,.14), transparent 65%);
     opacity:0; transition: opacity .35s; z-index:1; }
   .card:hover::after, .feat:hover::after, .moment:hover::after { opacity:1; }
 
+  /* "Altında başka bir kart var" hissi — net kenarlı, DÜZ (blursuz) teal bir kart,
+     gerçek kartın az arkasında/altında konumlanır ve hoverda görünür olur. ÖNEMLİ: bu
+     gerçek bir KARDEŞ eleman (pseudo DEĞİL) — bir elemanın kendi arka planı her zaman
+     kendi ::before/::after'ından ÖNCE, yani ALTINDA boyanmaz (aksini denedik, .dl-glow'da
+     bu yüzden hataya düşmüştük) — tek güvenilir yol, görünür kartın z-index'inin gölge
+     kardeşinden yüksek olması. .slot bu ikisini saran, grid hücresinin kendisi olan kutu. */
+  .slot { position:relative; }
+  .stack-shadow { position:absolute; inset:0; z-index:0; pointer-events:none;
+    background: var(--teal); box-shadow:0 16px 30px -14px rgba(0,0,0,.5);
+    opacity:0; transform:translate(0,0); transition: opacity .2s cubic-bezier(.2,.8,.2,1), transform .2s cubic-bezier(.2,.8,.2,1); }
+  .slot:hover .stack-shadow { opacity:1; transform:translate(11px,13px); }
+  .card-slot .stack-shadow { border-radius:20px; }
+  .feat-slot .stack-shadow { border-radius:16px; }
+  .moment-slot .stack-shadow { border-radius:18px; }
+
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .card:hover { transform: translateY(-7px); border-color: rgba(60,214,196,.4);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -18px rgba(0,0,0,.55), 0 26px 30px -20px rgba(21,181,164,.5); }
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+  .card:hover { transform: translate(-11px,-13px); border-color: rgba(60,214,196,.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -18px rgba(0,0,0,.55); }
   .card .num { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
     background: rgba(21,181,164,.14); color: var(--teal2); font-weight: 800; font-size: 19px; margin-bottom: 16px;
     transition: transform .3s, box-shadow .3s; position:relative; }
@@ -223,9 +241,9 @@
   .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--card2); border: 1px solid var(--line2); border-radius: 16px; padding: 22px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .feat:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.35);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 16px 34px -18px rgba(0,0,0,.5), 0 22px 26px -18px rgba(21,181,164,.45); }
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+  .feat:hover { transform: translate(-11px,-13px); border-color: rgba(60,214,196,.65);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 16px 34px -18px rgba(0,0,0,.5); }
   .feat .dot { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(60,214,196,.12); display: flex; align-items: center; justify-content: center; font-size:20px;
     transition: transform .3s; position:relative; }
   .feat:hover .dot { transform: scale(1.1) rotate(-4deg); }
@@ -236,9 +254,9 @@
   .moments-band { background: var(--bg2); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
   .moments { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
   .moment { background: linear-gradient(165deg,var(--card),#121a1f); border:1px solid var(--line); border-radius:18px; padding:20px; overflow:hidden;
-    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
-  .moment:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4);
-    box-shadow: 0 18px 38px -18px rgba(0,0,0,.55), 0 24px 28px -20px rgba(21,181,164,.48); }
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+  .moment:hover { transform: translate(-11px,-13px); border-color: rgba(60,214,196,.7);
+    box-shadow: 0 18px 38px -18px rgba(0,0,0,.55); }
   .moment::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(21,181,164,.16),transparent 70%); }
   .m-loc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--teal2); font-weight:700; position:relative; }
   .m-quote { color:var(--tx-hi); font-size:16px; font-weight:600; margin:12px 0 14px; line-height:1.5; position:relative; }
@@ -434,9 +452,9 @@
     <h2 class="reveal d1">Sesini bir yere bırak</h2>
     <p class="sub reveal d2">Not tutmak gibi — ama sesle ve o ana ait olduğu yere sabitlenmiş.</p>
     <div class="steps">
-      <div class="card reveal d1"><div class="num">1</div><h3>Kaydet</h3><p>Bulunduğun yerde tek dokunuşla sesli bir not kaydet. Konumu otomatik olarak o ana sabitlenir.</p></div>
-      <div class="card reveal d2"><div class="num">2</div><h3>Bırak</h3><p>Sesin haritada o noktada bekler. Sadece sen, arkadaşların ya da herkes duysun — sen seç.</p></div>
-      <div class="card reveal d3"><div class="num">3</div><h3>Yeniden yaşa</h3><p>O yere yaklaştığında Linger sana bildirim gönderir. Anıyı bıraktığın yerde, tam da orada dinlersin.</p></div>
+      <div class="slot card-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="card reveal d1"><div class="num">1</div><h3>Kaydet</h3><p>Bulunduğun yerde tek dokunuşla sesli bir not kaydet. Konumu otomatik olarak o ana sabitlenir.</p></div></div>
+      <div class="slot card-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="card reveal d2"><div class="num">2</div><h3>Bırak</h3><p>Sesin haritada o noktada bekler. Sadece sen, arkadaşların ya da herkes duysun — sen seç.</p></div></div>
+      <div class="slot card-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="card reveal d3"><div class="num">3</div><h3>Yeniden yaşa</h3><p>O yere yaklaştığında Linger sana bildirim gönderir. Anıyı bıraktığın yerde, tam da orada dinlersin.</p></div></div>
     </div>
   </div>
 </section>
@@ -448,10 +466,10 @@
     <h2 class="reveal d1">Küçük bir uygulama, büyük anlar</h2>
     <p class="sub reveal d2">Konumun etrafında dönen sade ve samimi bir deneyim.</p>
     <div class="features">
-      <div class="feat reveal d1"><div class="dot">📍</div><div><h3>Konuma sabitli sesler</h3><p>Her ses tam bırakıldığı koordinatta yaşar; harita üstünde canlı pin olarak görünür.</p></div></div>
-      <div class="feat reveal d2"><div class="dot">🔔</div><div><h3>Yaklaşınca hatırlat</h3><p>Bir sesin konumuna girdiğinde bildirim al — uygulama kapalıyken bile.</p></div></div>
-      <div class="feat reveal d1"><div class="dot">👥</div><div><h3>Arkadaşlarınla paylaş</h3><p>Sesleri sadece kendine sakla, arkadaşlarına ya da herkese aç. Kontrol tamamen sende.</p></div></div>
-      <div class="feat reveal d2"><div class="dot">🔒</div><div><h3>Gizlilik önce</h3><p>Reklam yok, izleme yok, veri satışı yok. Konumun yalnızca bu deneyim için kullanılır.</p></div></div>
+      <div class="slot feat-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="feat reveal d1"><div class="dot">📍</div><div><h3>Konuma sabitli sesler</h3><p>Her ses tam bırakıldığı koordinatta yaşar; harita üstünde canlı pin olarak görünür.</p></div></div></div>
+      <div class="slot feat-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="feat reveal d2"><div class="dot">🔔</div><div><h3>Yaklaşınca hatırlat</h3><p>Bir sesin konumuna girdiğinde bildirim al — uygulama kapalıyken bile.</p></div></div></div>
+      <div class="slot feat-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="feat reveal d1"><div class="dot">👥</div><div><h3>Arkadaşlarınla paylaş</h3><p>Sesleri sadece kendine sakla, arkadaşlarına ya da herkese aç. Kontrol tamamen sende.</p></div></div></div>
+      <div class="slot feat-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="feat reveal d2"><div class="dot">🔒</div><div><h3>Gizlilik önce</h3><p>Reklam yok, izleme yok, veri satışı yok. Konumun yalnızca bu deneyim için kullanılır.</p></div></div></div>
     </div>
   </div>
 </section>
@@ -463,24 +481,24 @@
     <h2 class="reveal d1">İnsanlar buralara ne bıraktı?</h2>
     <p class="sub reveal d2">Bir bankta, bir sokakta, bir sahilde… her pin küçük bir hikâye.</p>
     <div class="moments">
-      <div class="moment reveal d1">
+      <div class="slot moment-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="moment reveal d1">
         <span class="m-loc">📍 Moda Sahili</span>
         <p class="m-quote">"Burada ilk kez elini tuttum. Sen de bir gün gelirsen bu sesi bulursun."</p>
         <div class="m-wave"><i style="height:40%"></i><i style="height:70%"></i><i style="height:95%"></i><i style="height:55%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:60%"></i><i style="height:90%"></i><i style="height:45%"></i><i style="height:72%"></i><i style="height:30%"></i><i style="height:58%"></i></div>
         <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#3CD6C4">E</span> Ela</span><span>0:18 · 2 gün önce</span></div>
-      </div>
-      <div class="moment reveal d2">
+      </div></div>
+      <div class="slot moment-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="moment reveal d2">
         <span class="m-loc">📍 Kadıköy · Tren durağı</span>
         <p class="m-quote">"Her sabah bu perondan geçerken çalan şarkıyı bırakıyorum. Günün güzel geçsin."</p>
         <div class="m-wave"><i style="height:30%"></i><i style="height:60%"></i><i style="height:85%"></i><i style="height:45%"></i><i style="height:95%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:38%"></i><i style="height:82%"></i><i style="height:55%"></i><i style="height:66%"></i><i style="height:42%"></i></div>
         <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#15B5A4">M</span> Mert</span><span>0:24 · 5 gün önce</span></div>
-      </div>
-      <div class="moment reveal d3">
+      </div></div>
+      <div class="slot moment-slot"><div class="stack-shadow" aria-hidden="true"></div><div class="moment reveal d3">
         <span class="m-loc">📍 Cihangir · O kahve</span>
         <p class="m-quote">"Buradaki masamıza küçük bir teşekkür bıraktım. Umarım gelen kişi gülümser."</p>
         <div class="m-wave"><i style="height:50%"></i><i style="height:75%"></i><i style="height:40%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:68%"></i><i style="height:48%"></i><i style="height:88%"></i><i style="height:52%"></i><i style="height:62%"></i></div>
         <div class="m-foot"><span class="m-av"><span class="m-dotimg" style="background:#3CD6C4">Z</span> Zeynep</span><span>0:12 · bugün</span></div>
-      </div>
+      </div></div>
     </div>
     <p style="text-align:center; color:var(--tx-lo); font-size:12.5px; margin-top:22px;">* Örnek gösterim içeriğidir.</p>
   </div>
@@ -566,18 +584,6 @@
     });
   });
 
-  // Magnetik hover — App Store / nav CTA butonları imleci hafifçe takip eder.
-  function magnetize(el, strength, lift) {
-    el.addEventListener('mousemove', function (e) {
-      var r = el.getBoundingClientRect();
-      var x = (e.clientX - r.left - r.width / 2) * strength;
-      var y = (e.clientY - r.top - r.height / 2) * strength;
-      el.style.transform = 'translate3d(' + x + 'px,' + (y - lift) + 'px,0)';
-    });
-    el.addEventListener('mouseleave', function () { el.style.transform = ''; });
-  }
-  document.querySelectorAll('.appstore-btn').forEach(function (el) { magnetize(el, .16, 2); });
-  document.querySelectorAll('.nav-cta').forEach(function (el) { magnetize(el, .22, 1); });
 
   // Sol menü (drawer)
   var menuBtn = document.getElementById('menuBtn');
