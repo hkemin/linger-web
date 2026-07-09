@@ -30,9 +30,15 @@
   a { color: var(--teal2); text-decoration: none; }
   .wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
 
-  /* ── Reveal on scroll ─────────────────────────────── */
-  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
-  .reveal.in { opacity: 1; transform: none; }
+  /* ── Scroll ilerleme çubuğu ───────────────────────── */
+  .scroll-progress { position:fixed; top:0; left:0; height:3px; width:0%; z-index:200;
+    background: linear-gradient(90deg,var(--teal),var(--teal2)); box-shadow:0 0 14px rgba(60,214,196,.55);
+    transform-origin: left; will-change: width; }
+
+  /* ── Reveal on scroll — blur-to-focus + hafif ölçek, sade fade'den daha "premium" ── */
+  .reveal { opacity: 0; transform: translateY(28px) scale(.97); filter: blur(7px);
+    transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), filter .8s cubic-bezier(.16,1,.3,1); }
+  .reveal.in { opacity: 1; transform: none; filter: blur(0); }
   .reveal.d1 { transition-delay:.08s } .reveal.d2 { transition-delay:.16s } .reveal.d3 { transition-delay:.24s } .reveal.d4 { transition-delay:.32s }
 
   /* ── Nav ──────────────────────────────────────────── */
@@ -45,7 +51,7 @@
     transition: opacity .15s; }
   .nav-brand:hover { opacity:.8; }
   .nav-cta { font-size:14.5px; font-weight:700; padding:9px 16px; border-radius:999px; background:var(--teal); color:#05201D;
-    transition: transform .15s, box-shadow .15s; }
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .15s; }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21,181,164,.4); }
 
   /* ── Sol menü (hamburger + slide-in drawer) ─────────── */
@@ -89,27 +95,41 @@
   /* ── Hero ─────────────────────────────────────────── */
   .hero { position: relative; overflow: hidden; padding: 70px 22px 40px;
     background: radial-gradient(760px 460px at 72% 8%, rgba(21,181,164,.14), transparent 70%), var(--bg); }
-  .hero-grid { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
+  /* Ambient orb'lar — mevcut paletten (teal + coral), sadece yavaşça sürükleniyor. transform-only, ucuz. */
+  .orb { position:absolute; border-radius:50%; filter:blur(64px); z-index:0; pointer-events:none; }
+  .orb1 { width:420px; height:420px; left:-130px; top:-90px; background:radial-gradient(circle, rgba(21,181,164,.24), transparent 72%); animation: orbDrift1 17s ease-in-out infinite; }
+  .orb2 { width:320px; height:320px; right:-90px; bottom:-110px; background:radial-gradient(circle, rgba(255,107,92,.15), transparent 72%); animation: orbDrift2 21s ease-in-out infinite; }
+  @keyframes orbDrift1 { 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(46px,32px) } }
+  @keyframes orbDrift2 { 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(-34px,-42px) } }
+  .hero-grid { position:relative; z-index:1; max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
   .badge-pill { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border:1px solid var(--line);
     border-radius:999px; font-size:13.5px; color:var(--tx-mid); background:var(--card); }
   .badge-dot { width:8px; height:8px; border-radius:50%; background:var(--teal2); box-shadow:0 0 0 0 rgba(60,214,196,.6); animation: pulseDot 2.4s infinite; }
   @keyframes pulseDot { 0%{box-shadow:0 0 0 0 rgba(60,214,196,.55)} 70%{box-shadow:0 0 0 9px rgba(60,214,196,0)} 100%{box-shadow:0 0 0 0 rgba(60,214,196,0)} }
   h1.hero-title { font-size: 52px; font-weight: 800; letter-spacing: -1.4px; color: var(--tx-hi); line-height: 1.05; margin: 20px 0 0; }
-  h1.hero-title .grad { background: linear-gradient(100deg,var(--teal2),var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  h1.hero-title .grad { background: linear-gradient(100deg,var(--teal2),var(--teal),var(--teal2)); background-size:220% auto;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: gradShift 6s ease-in-out infinite; }
+  @keyframes gradShift { 0%,100%{ background-position: 0% center } 50%{ background-position: 100% center } }
   .hero-lead { font-size: 18.5px; color: var(--tx-mid); max-width: 480px; margin-top: 18px; }
   .cta-row { margin-top: 30px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
   .ghost-link { font-weight:700; color:var(--tx-hi); font-size:15.5px; display:inline-flex; align-items:center; gap:7px; }
   .ghost-link:hover { color: var(--teal2); }
 
-  /* App Store button */
+  /* App Store button — magnetik hover (JS, transform) + tıklanınca/hoverda geçen ince ışık huzmesi. */
   .appstore-btn { display:inline-flex; align-items:center; gap:11px; padding:12px 20px 12px 18px; border-radius:14px;
-    background:#EAF0F1; color:#0B1013; position:relative; transition: transform .15s, box-shadow .2s; }
-  .appstore-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+    background:#EAF0F1; color:#0B1013; position:relative; overflow:hidden;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+  .appstore-btn:hover { box-shadow: 0 16px 38px rgba(0,0,0,.42); }
+  .appstore-btn::before { content:''; position:absolute; top:0; left:0; width:40%; height:100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    transform: skewX(-18deg) translateX(-250%); transition: transform .7s cubic-bezier(.2,.7,.2,1); pointer-events:none; }
+  .appstore-btn:hover::before { transform: skewX(-18deg) translateX(400%); }
   .appstore-btn .as-sub { font-size:11px; line-height:1; opacity:.72; font-weight:600; }
   .appstore-btn .as-main { font-size:19px; line-height:1.15; font-weight:800; letter-spacing:-.3px; }
   .appstore-btn .soon-tag { position:absolute; top:-9px; right:-9px; background:var(--teal); color:#05201D; font-size:10.5px;
-    font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.3px; box-shadow:0 4px 12px rgba(21,181,164,.5); }
+    font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.3px; box-shadow:0 4px 12px rgba(21,181,164,.5); z-index:1; }
   .appstore-btn.soon { cursor: default; }
+  .appstore-btn > span, .appstore-btn > svg { position:relative; z-index:1; }
 
   /* ── Phone mockup ─────────────────────────────────── */
   .device-col { display:flex; justify-content:center; position:relative; }
@@ -176,31 +196,52 @@
   h2 { color: var(--tx-hi); font-size: 33px; font-weight: 800; letter-spacing: -0.7px; text-align: center; margin: 10px 0 8px; }
   .sub { text-align: center; color: var(--tx-mid); max-width: 560px; margin: 0 auto 48px; }
 
+  /* Cursor-spotlight hover — .card/.feat/.moment ortak: fare pozisyonu JS ile --mx/--my'ye
+     yazılır, ::after bunu radial-gradient olarak gösterir. Yalnızca opacity geçişi (ucuz),
+     hover dışında pointer-events:none. */
+  .card, .feat, .moment { --mx:50%; --my:50%; position:relative; }
+  .card::after, .feat::after, .moment::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background: radial-gradient(240px circle at var(--mx) var(--my), rgba(60,214,196,.14), transparent 65%);
+    opacity:0; transition: opacity .35s; z-index:1; }
+  .card:hover::after, .feat:hover::after, .moment:hover::after { opacity:1; }
+
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px; transition: transform .25s, border-color .25s; }
-  .card:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
+  .card:hover { transform: translateY(-7px); border-color: rgba(60,214,196,.4); box-shadow: 0 18px 40px -18px rgba(0,0,0,.55); }
   .card .num { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
-    background: rgba(21,181,164,.14); color: var(--teal2); font-weight: 800; font-size: 19px; margin-bottom: 16px; }
+    background: rgba(21,181,164,.14); color: var(--teal2); font-weight: 800; font-size: 19px; margin-bottom: 16px;
+    transition: transform .3s, box-shadow .3s; position:relative; }
+  .card:hover .num { transform: scale(1.08); box-shadow: 0 0 0 7px rgba(21,181,164,.1); }
   .card h3 { color: var(--tx-hi); font-size: 19px; font-weight: 700; margin-bottom: 8px; }
   .card p { color: #A9B8BE; font-size: 15.5px; }
 
   .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-  .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--card2); border: 1px solid var(--line2); border-radius: 16px; padding: 22px; transition: transform .25s, border-color .25s; }
-  .feat:hover { transform: translateY(-4px); border-color: rgba(60,214,196,.35); }
-  .feat .dot { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(60,214,196,.12); display: flex; align-items: center; justify-content: center; font-size:20px; }
+  .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--card2); border: 1px solid var(--line2); border-radius: 16px; padding: 22px;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
+  .feat:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.35); box-shadow: 0 16px 34px -18px rgba(0,0,0,.5); }
+  .feat .dot { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(60,214,196,.12); display: flex; align-items: center; justify-content: center; font-size:20px;
+    transition: transform .3s; position:relative; }
+  .feat:hover .dot { transform: scale(1.1) rotate(-4deg); }
   .feat h3 { color: var(--tx-hi); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
   .feat p { color: #93A4AB; font-size: 15px; }
 
   /* Moments (mock) */
   .moments-band { background: var(--bg2); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
   .moments { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
-  .moment { background: linear-gradient(165deg,var(--card),#121a1f); border:1px solid var(--line); border-radius:18px; padding:20px; position:relative; overflow:hidden; transition: transform .25s, border-color .25s; }
-  .moment:hover { transform: translateY(-5px); border-color: rgba(60,214,196,.4); }
+  .moment { background: linear-gradient(165deg,var(--card),#121a1f); border:1px solid var(--line); border-radius:18px; padding:20px; overflow:hidden;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; }
+  .moment:hover { transform: translateY(-6px); border-color: rgba(60,214,196,.4); box-shadow: 0 18px 38px -18px rgba(0,0,0,.55); }
   .moment::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(21,181,164,.16),transparent 70%); }
   .m-loc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--teal2); font-weight:700; position:relative; }
   .m-quote { color:var(--tx-hi); font-size:16px; font-weight:600; margin:12px 0 14px; line-height:1.5; position:relative; }
   .m-wave { display:flex; align-items:flex-end; gap:3px; height:26px; }
-  .m-wave i { flex:1; background:linear-gradient(var(--teal2),var(--teal)); border-radius:2px; opacity:.85; }
+  /* Dalgalar gerçek kaydın "dinlenişi" gibi hafifçe nefes alsın — scaleY (transform, ucuz),
+     height DEĞİL. nth-child ile sahte-rastgele stagger (her bar için ayrı delay yazmaya gerek yok). */
+  .m-wave i { flex:1; background:linear-gradient(var(--teal2),var(--teal)); border-radius:2px; opacity:.85;
+    transform-origin:bottom; animation: mwave 1.7s ease-in-out infinite; }
+  @keyframes mwave { 0%,100%{ transform:scaleY(.86) } 50%{ transform:scaleY(1) } }
+  .m-wave i:nth-child(2n) { animation-delay:.11s; } .m-wave i:nth-child(3n) { animation-delay:.23s; } .m-wave i:nth-child(4n) { animation-delay:.35s; }
   .m-foot { display:flex; align-items:center; justify-content:space-between; margin-top:14px; font-size:12px; color:var(--tx-mid); }
   .m-av { display:flex; align-items:center; gap:8px; }
   .m-dotimg { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#05201D; }
@@ -208,13 +249,23 @@
   /* Privacy band */
   .privacy-band { background: linear-gradient(180deg, var(--card2), var(--bg)); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
   .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
-  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 10px 18px; font-size: 14.5px; color: var(--tx); font-weight: 600; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 10px 18px; font-size: 14.5px; color: var(--tx); font-weight: 600;
+    transition: transform .2s, border-color .2s, background .2s; }
+  .chip:hover { transform: translateY(-2px); border-color: rgba(60,214,196,.5); background: var(--card2); }
 
   /* Download CTA */
   .download { text-align:center; position:relative; overflow:hidden;
     background: radial-gradient(600px 300px at 50% 120%, rgba(21,181,164,.18), transparent 70%); }
   .dl-card { max-width:720px; margin:0 auto; background:linear-gradient(160deg,var(--card),#101820); border:1px solid var(--line);
-    border-radius:28px; padding:52px 30px; }
+    border-radius:28px; padding:52px 30px; position:relative; }
+  /* Yavaşça dönen gradient kenarlık — asıl CTA'yı ince bir ışıkla vurgular. mask ile
+     yalnızca 1px'lik "halka" boyanır, kart içeriği etkilenmez; transform-only, ucuz. */
+  .dl-card::before { content:''; position:absolute; inset:-1.5px; border-radius:29px; padding:1.5px;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(60,214,196,.65) 18%, transparent 36%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: dlBorderSpin 6s linear infinite; pointer-events:none; }
+  @keyframes dlBorderSpin { to { transform: rotate(360deg); } }
 
   /* Footer */
   footer { padding: 54px 22px 64px; border-top: 1px solid var(--line2); text-align: center; }
@@ -232,12 +283,15 @@
     h1.hero-title { font-size: 40px; } h2 { font-size: 27px; } section { padding: 58px 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .reveal { transition: none; opacity:1; transform:none; }
-    .phone, .sonar, .badge-dot, .wave i, .phone-glow, .pin, .map { animation: none !important; }
+    .reveal { transition: none; opacity:1; transform:none; filter:none; }
+    .phone, .sonar, .badge-dot, .wave i, .phone-glow, .pin, .map,
+    .orb1, .orb2, .grad, .m-wave i, .dl-card::before { animation: none !important; }
   }
 </style>
 </head>
 <body>
+
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <!-- 🔗 APP STORE LİNKİ — Uygulama App Store'da yayınlanınca:
      1) Aşağıdaki iki  <a class="appstore-btn ...">  öğesinin href'ini gerçek URL ile değiştir
@@ -297,6 +351,8 @@
 
 <!-- ── Hero ─────────────────────────────────────────── -->
 <div class="hero">
+  <div class="orb orb1" aria-hidden="true"></div>
+  <div class="orb orb2" aria-hidden="true"></div>
   <div class="hero-grid">
     <div class="hero-copy">
       <span class="badge-pill reveal in"><span class="badge-dot"></span>Mekânın hafızası · sesle</span>
@@ -450,10 +506,46 @@
 </footer>
 
 <script>
-  // Nav kenarlığı — sayfa kaydırılınca belirir
+  // Nav kenarlığı + scroll ilerleme çubuğu — TEK rAF-throttled scroll handler
+  // (iki ayrı scroll listener yerine, jank riskini azaltmak için birleştirildi).
   var nav = document.getElementById('nav');
-  var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 8); };
-  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+  var scrollProgress = document.getElementById('scrollProgress');
+  var scrollTicking = false;
+  function onScrollFrame() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - doc.clientHeight;
+    var pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
+    scrollProgress.style.width = pct + '%';
+    nav.classList.toggle('scrolled', doc.scrollTop > 8);
+    scrollTicking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!scrollTicking) { requestAnimationFrame(onScrollFrame); scrollTicking = true; }
+  }, { passive: true });
+  onScrollFrame();
+
+  // Cursor-spotlight — kart/özellik/an kartlarında imleci takip eden ince parıltı.
+  // Yalnızca imleç kartın ÜZERİNDEYKEN tetiklenir (native mousemove throttling'i), maliyeti düşük.
+  document.querySelectorAll('.card, .feat, .moment').forEach(function (el) {
+    el.addEventListener('mousemove', function (e) {
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  // Magnetik hover — App Store / nav CTA butonları imleci hafifçe takip eder.
+  function magnetize(el, strength, lift) {
+    el.addEventListener('mousemove', function (e) {
+      var r = el.getBoundingClientRect();
+      var x = (e.clientX - r.left - r.width / 2) * strength;
+      var y = (e.clientY - r.top - r.height / 2) * strength;
+      el.style.transform = 'translate3d(' + x + 'px,' + (y - lift) + 'px,0)';
+    });
+    el.addEventListener('mouseleave', function () { el.style.transform = ''; });
+  }
+  document.querySelectorAll('.appstore-btn').forEach(function (el) { magnetize(el, .16, 2); });
+  document.querySelectorAll('.nav-cta').forEach(function (el) { magnetize(el, .22, 1); });
 
   // Sol menü (drawer)
   var menuBtn = document.getElementById('menuBtn');
