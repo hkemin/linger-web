@@ -312,6 +312,23 @@
     box-shadow:0 0 0 0 rgba(60,214,196,.45); animation: dlPulseRing 2.6s ease-out infinite; }
   @keyframes dlPulseRing { 0%{ box-shadow:0 0 0 0 rgba(60,214,196,.45) } 70%{ box-shadow:0 0 0 14px rgba(60,214,196,0) } 100%{ box-shadow:0 0 0 0 rgba(60,214,196,0) } }
 
+  /* Bekleme listesi formu — App Store yayına çıkana kadar gerçek CTA. */
+  .waitlist-form { display:flex; gap:10px; max-width:380px; margin:0 auto; flex-wrap:wrap; justify-content:center; }
+  .waitlist-input { flex:1; min-width:200px; background:var(--card2); border:1px solid var(--line); border-radius:14px;
+    padding:13px 16px; color:var(--tx-hi); font-family:inherit; font-size:15px; outline:none;
+    transition: border-color .2s, box-shadow .2s; }
+  .waitlist-input::placeholder { color:var(--tx-lo); }
+  .waitlist-input:focus { border-color: var(--teal2); box-shadow: 0 0 0 3px rgba(60,214,196,.15); }
+  .waitlist-btn { flex:none; background:var(--teal); color:#05201D; border:none; border-radius:14px; padding:13px 22px;
+    font-family:inherit; font-weight:800; font-size:15px; cursor:pointer;
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s, opacity .2s; }
+  .waitlist-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(21,181,164,.4); }
+  .waitlist-btn:disabled { opacity:.6; cursor:default; transform:none; box-shadow:none; }
+  .waitlist-msg { min-height:20px; margin-top:12px; font-size:14px; font-weight:600; }
+  .waitlist-msg.ok { color: var(--teal2); }
+  .waitlist-msg.err { color: var(--coral); }
+  .dl-or { color:var(--tx-lo); font-size:13px; margin:22px 0 14px; }
+
   /* Footer */
   footer { padding: 54px 22px 64px; border-top: 1px solid var(--line2); text-align: center; }
   .foot-brand { font-size: 22px; font-weight: 800; color: var(--tx-hi); letter-spacing: -0.5px; }
@@ -531,7 +548,15 @@
         <rect x="69" y="31" width="6" height="12" rx="3" fill="#fff"/>
       </svg>
       <h2 style="margin-top:18px;">Sesini bırakmaya hazır mısın?</h2>
-      <p class="sub" style="margin-bottom:28px;">Linger yakında App Store'da. İlk bırakılan sesler senin olsun.</p>
+      <p class="sub" style="margin-bottom:28px;">Linger yakında App Store'da. Haber vermemizi ister misin?</p>
+
+      <form id="waitlistForm" class="waitlist-form" novalidate>
+        <input type="email" id="waitlistEmail" class="waitlist-input" placeholder="e-posta adresin" required autocomplete="email" inputmode="email" aria-label="E-posta adresin">
+        <button type="submit" class="waitlist-btn">Haber ver</button>
+      </form>
+      <p id="waitlistMsg" class="waitlist-msg" aria-live="polite"></p>
+
+      <p class="dl-or">veya</p>
       <span class="dl-cta-wrap">
         <a class="appstore-btn soon" id="appstore-cta" href="#indir" aria-label="App Store'dan indir (yakında)">
           <span class="as-clip">
@@ -623,6 +648,51 @@
       if (t) t.scrollIntoView({ behavior: 'smooth' });
     });
   });
+
+  // Bekleme listesi — Supabase'e doğrudan REST (PostgREST) ile yazar, uygulamanın
+  // kullandığı AYNI proje + anon key (public-safe, RLS ile korunur; SDK yüklemeye
+  // gerek yok, tek insert için fazla ağırlık olurdu).
+  var SUPABASE_URL = 'https://qxpjkzygajzrypadbofx.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4cGprenlnYWp6cnlwYWRib2Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTU3NTEsImV4cCI6MjA5ODIzMTc1MX0.oIupHPT5-AD9c4aRqSq7IW3H5ryrtZmnCwKCftqZ1zc';
+  var wlForm = document.getElementById('waitlistForm');
+  var wlInput = document.getElementById('waitlistEmail');
+  var wlMsg = document.getElementById('waitlistMsg');
+  if (wlForm) {
+    wlForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = wlInput.value.trim();
+      if (!email) return;
+      var btn = wlForm.querySelector('.waitlist-btn');
+      btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+      wlMsg.textContent = ''; wlMsg.className = 'waitlist-msg';
+      fetch(SUPABASE_URL + '/rest/v1/waitlist', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ email: email, source: 'web' })
+      }).then(function (res) {
+        btn.disabled = false; btn.textContent = 'Haber ver';
+        if (res.ok) {
+          wlMsg.textContent = 'Teşekkürler! App Store\'a çıkınca ilk sen haber alacaksın.';
+          wlMsg.classList.add('ok');
+          wlForm.reset();
+        } else if (res.status === 409) {
+          wlMsg.textContent = 'Bu e-posta zaten listede — merak etme, unutmadık.';
+          wlMsg.classList.add('ok');
+        } else {
+          throw new Error('request failed: ' + res.status);
+        }
+      }).catch(function () {
+        btn.disabled = false; btn.textContent = 'Haber ver';
+        wlMsg.textContent = 'Bir şeyler ters gitti, birazdan tekrar dener misin?';
+        wlMsg.classList.add('err');
+      });
+    });
+  }
 </script>
 
 </body>
